@@ -1,0 +1,54 @@
+{
+  "brand_name": "AutoAffiliate Pulse",
+  "site_tagline": "Авто-подборка полезных находок и сделок в AI/продуктивности",
+  "output_dir": "site",
+  "state_db": "state.db",
+  "public_base_url": "https://your-domain.com",
+  "keywords": [
+    "ai",
+    "automation",
+    "productivity",
+    "startup",
+    "tool",
+    "saas",
+    "скидка",
+    "бесплатно"
+  ],
+  "feeds": [
+    "https://feeds.feedburner.com/lifehacker/full",
+    "https://hnrss.org/frontpage",
+    "https://www.producthunt.com/feed"
+  ],
+  "max_posts_per_run": 5,
+  "cta_variants": [
+    "Открыть предложение",
+    "Смотреть детали",
+    "Перейти к инструменту"
+  ],
+  "affiliate_disclaimer": "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
+  "affiliate": {
+    "global_utm": {
+      "utm_source": "autopulse",
+      "utm_medium": "seo",
+      "utm_campaign": "daily"
+    },
+    "domain_rules": [
+      {
+        "domain": "appsumo.com",
+        "params": {
+          "aff": "YOUR_ID"
+        }
+      },
+      {
+        "domain": "amazon.com",
+        "params": {
+          "tag": "YOUR_AMAZON_TAG"
+        }
+      }
+    ]
+  },
+  "telegram": {
+    "bot_token": "",
+    "chat_id": ""
+  }
+}
