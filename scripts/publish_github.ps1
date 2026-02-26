@@ -83,9 +83,28 @@ if (-not $hasOrigin) {
     & $gh repo create $repo --$Visibility --source . --remote origin --push
 }
 else {
-    git push -u origin main
+    $currentBranch = (git branch --show-current).Trim()
+    if (-not $currentBranch) {
+        $currentBranch = "master"
+    }
+    git push -u origin $currentBranch
 }
 
-& $gh workflow run "GitHub Pages AutoDeploy" --ref main
+$currentBranch = (git branch --show-current).Trim()
+if (-not $currentBranch) {
+    $currentBranch = "master"
+}
+
+$repoFullName = "$user/$RepoName"
+$workflows = & $gh api "repos/$repoFullName/actions/workflows" --jq ".workflows[].path"
+
+if ($workflows -and ($workflows -match "github-pages-autodeploy.yml")) {
+    & $gh workflow run "github-pages-autodeploy.yml" --ref $currentBranch -R $repoFullName
+    Write-Output "Workflow GitHub Pages AutoDeploy started on branch: $currentBranch"
+}
+else {
+    Write-Output "Workflow пока не зарегистрирован GitHub API. Это иногда бывает на новом репозитории."
+    Write-Output "Откройте: https://github.com/$repoFullName/actions и нажмите 'Enable workflows', если кнопка есть."
+}
 
 Write-Output "Done: repository and auto-deploy are configured."
