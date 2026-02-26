@@ -172,45 +172,80 @@ def slugify(text: str) -> str:
 
 
 def render_post(entry: Entry, monetized_link: str, config: Dict) -> str:
-    cta_variants = config.get("cta_variants", ["Проверить предложение"])
-    cta_text = random.choice(cta_variants)
-    source_domain = urllib.parse.urlparse(entry.link).netloc
-    disclaimer = config.get(
-        "affiliate_disclaimer",
-        "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
-    )
+        cta_variants = config.get("cta_variants", ["Проверить предложение"])
+        cta_text = random.choice(cta_variants)
+        hook_variants = config.get(
+                "hook_variants",
+                [
+                        "Коротко: где здесь ценность и как это можно использовать для роста дохода.",
+                        "Практично: что попробовать сегодня, чтобы получить результат быстрее.",
+                ],
+        )
+        hook_text = random.choice(hook_variants)
+        source_domain = urllib.parse.urlparse(entry.link).netloc
+        lead_magnet = config.get("lead_magnet", {})
+        lead_title = lead_magnet.get("title", "Бонус: чек-лист внедрения")
+        lead_description = lead_magnet.get(
+                "description",
+                "Заберите мини-гайд и получите простую схему внедрения за 20 минут.",
+        )
+        lead_button = lead_magnet.get("button_text", "Получить чек-лист")
+        lead_url = lead_magnet.get("url", "")
+        telegram_channel = config.get("telegram", {}).get("channel_url", "")
+        disclaimer = config.get(
+                "affiliate_disclaimer",
+                "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
+        )
 
-    return f"""<!doctype html>
+        lead_button_html = (
+                f'<a class="cta cta-secondary" href="{html.escape(lead_url)}" target="_blank" rel="noopener">{html.escape(lead_button)}</a>'
+                if lead_url
+                else ""
+        )
+        telegram_html = (
+                f'<p class="meta">Подписка: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram канал</a></p>'
+                if telegram_channel
+                else ""
+        )
+
+        return f"""<!doctype html>
 <html lang=\"ru\">
 <head>
-  <meta charset=\"utf-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-  <title>{html.escape(entry.title)} | {html.escape(config['brand_name'])}</title>
-  <link rel=\"stylesheet\" href=\"../assets/style.css\" />
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>{html.escape(entry.title)} | {html.escape(config['brand_name'])}</title>
+    <link rel=\"stylesheet\" href=\"../assets/style.css\" />
 </head>
 <body>
-  <main class=\"container\">
-    <header>
-      <a href=\"../index.html\" class=\"back\">← На главную</a>
-      <h1>{html.escape(entry.title)}</h1>
-      <p class=\"meta\">Источник: {html.escape(source_domain)} · {html.escape(entry.published_at)}</p>
-    </header>
+    <main class=\"container\">
+        <header>
+            <a href=\"../index.html\" class=\"back\">← На главную</a>
+            <h1>{html.escape(entry.title)}</h1>
+            <p class=\"meta\">Источник: {html.escape(source_domain)} · {html.escape(entry.published_at)}</p>
+        </header>
 
-    <section class=\"card\">
-      <p>{html.escape(entry.description or 'Краткий обзор по теме и возможностям монетизации.')}</p>
-      <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\">{html.escape(cta_text)}</a>
-      <p class=\"disclaimer\">{html.escape(disclaimer)}</p>
-    </section>
+        <section class=\"card\">
+            <p class=\"hook\">{html.escape(hook_text)}</p>
+            <p>{html.escape(entry.description or 'Краткий обзор по теме и возможностям монетизации.')}</p>
+            <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\">{html.escape(cta_text)}</a>
+            <p class=\"disclaimer\">{html.escape(disclaimer)}</p>
+        </section>
 
-    <section class=\"ad-slot\">
-      <p>Рекламный слот (вставьте AdSense/другую сеть)</p>
-      <pre>&lt;!-- Ad code here --&gt;</pre>
-    </section>
-  </main>
+        <section class=\"card growth\">
+            <h3>{html.escape(lead_title)}</h3>
+            <p>{html.escape(lead_description)}</p>
+            {lead_button_html}
+            {telegram_html}
+        </section>
+
+        <section class=\"ad-slot\">
+            <p>Рекламный слот (вставьте AdSense/другую сеть)</p>
+            <pre>&lt;!-- Ad code here --&gt;</pre>
+        </section>
+    </main>
 </body>
 </html>
 """
-
 
 def write_css(path: Path) -> None:
     css = """
@@ -218,18 +253,37 @@ def write_css(path: Path) -> None:
 body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #f6f7fb; color: #111827; }
 .container { max-width: 820px; margin: 0 auto; padding: 24px; }
 h1 { margin: 8px 0 12px; line-height: 1.25; }
+h3 { margin: 0 0 8px; }
 .card, .ad-slot, .post-list li { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 4px rgba(17,24,39,.08); }
 .meta, .disclaimer { color: #6b7280; font-size: 14px; }
 .back { color: #4f46e5; text-decoration: none; }
+.hook { margin-top: 0; font-weight: 600; }
 .cta { display: inline-block; margin-top: 12px; text-decoration: none; background: #4f46e5; color: white; padding: 10px 14px; border-radius: 10px; font-weight: 600; }
+.cta-secondary { background: #111827; }
 .post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .post-list a { color: #111827; text-decoration: none; }
 .ad-slot pre { overflow-x: auto; }
+.hero { margin-bottom: 14px; }
 """.strip()
     path.write_text(css, encoding="utf-8")
 
 
 def render_index(posts: List[Dict], config: Dict) -> str:
+    telegram_channel = config.get("telegram", {}).get("channel_url", "")
+    lead_magnet = config.get("lead_magnet", {})
+    hero_cta_label = lead_magnet.get("button_text", "Получить бонус")
+    hero_cta_url = lead_magnet.get("url", "")
+    hero_button_html = (
+        f'<a class="cta" href="{html.escape(hero_cta_url)}" target="_blank" rel="noopener">{html.escape(hero_cta_label)}</a>'
+        if hero_cta_url
+        else ""
+    )
+    hero_telegram_html = (
+        f'<p class="meta">Следить за обновлениями: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
+        if telegram_channel
+        else ""
+    )
+
     items = []
     for post in posts:
         items.append(
@@ -250,6 +304,11 @@ def render_index(posts: List[Dict], config: Dict) -> str:
   <main class=\"container\">
     <h1>{html.escape(config['brand_name'])}</h1>
     <p>{html.escape(config['site_tagline'])}</p>
+    <section class=\"card hero\">
+      <p class=\"hook\">Свежие инструменты и офферы для роста продуктивности и дохода.</p>
+      {hero_button_html}
+      {hero_telegram_html}
+    </section>
     <ul class=\"post-list\">{posts_html}</ul>
   </main>
 </body>

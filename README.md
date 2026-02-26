@@ -17,6 +17,7 @@
 3. Заполните в `config.json`:
    - `public_base_url` (ваш домен),
    - affiliate-параметры,
+   - `lead_magnet.url` и `telegram.channel_url` для блоков конверсии,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
 4. Разовый запуск:
 
