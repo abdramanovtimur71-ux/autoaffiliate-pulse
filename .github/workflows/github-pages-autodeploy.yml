@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Prepare config
+        run: cp config.example.json config.json
+
       - name: Build static site
         run: python app.py --config config.json
 
