@@ -72,10 +72,43 @@ def fetch_url(url: str, timeout: int = 20) -> str:
     return raw.decode("utf-8", errors="ignore")
 
 
-def parse_rss(xml_text: str, source_url: str, keywords: List[str]) -> List[Entry]:
+def compute_entry_score(
+    title: str,
+    description: str,
+    link: str,
+    niche_keywords: List[str],
+    commercial_keywords: List[str],
+    affiliate_domains: List[str],
+) -> int:
+    text = f"{title} {description}".lower()
+    score = 0
+
+    score += sum(2 for kw in niche_keywords if kw in text)
+    score += sum(3 for kw in commercial_keywords if kw in text)
+
+    title_lower = title.lower()
+    score += sum(2 for kw in commercial_keywords if kw in title_lower)
+
+    parsed = urllib.parse.urlparse(link)
+    domain = parsed.netloc.lower().replace("www.", "")
+    if any(item and item in domain for item in affiliate_domains):
+        score += 5
+
+    return score
+
+
+def parse_rss(
+    xml_text: str,
+    source_url: str,
+    keywords: List[str],
+    commercial_keywords: List[str],
+    affiliate_domains: List[str],
+    min_score: int,
+) -> List[Entry]:
     root = ET.fromstring(xml_text)
     items: List[Entry] = []
     lowered_keywords = [item.lower() for item in keywords]
+    lowered_commercial_keywords = [item.lower() for item in commercial_keywords]
 
     for node in root.findall(".//item"):
         title = (node.findtext("title") or "").strip()
@@ -87,9 +120,15 @@ def parse_rss(xml_text: str, source_url: str, keywords: List[str]) -> List[Entry
         if not title or not link:
             continue
 
-        text = f"{title} {description}".lower()
-        score = sum(1 for kw in lowered_keywords if kw in text)
-        if score == 0:
+        score = compute_entry_score(
+            title=title,
+            description=description,
+            link=link,
+            niche_keywords=lowered_keywords,
+            commercial_keywords=lowered_commercial_keywords,
+            affiliate_domains=affiliate_domains,
+        )
+        if score < min_score:
             continue
 
         items.append(
@@ -355,11 +394,24 @@ def run_once(config: Dict) -> Dict[str, int]:
 
     all_entries: List[Entry] = []
     errors = 0
+    affiliate_domains = [
+        item.get("domain", "").lower().replace("www.", "")
+        for item in config.get("affiliate", {}).get("domain_rules", [])
+    ]
+    commercial_keywords = config.get("commercial_keywords", [])
+    min_score = int(config.get("min_publish_score", 4))
 
     for feed in config.get("feeds", []):
         try:
             xml_text = fetch_url(feed)
-            parsed = parse_rss(xml_text, feed, config.get("keywords", []))
+            parsed = parse_rss(
+                xml_text,
+                feed,
+                config.get("keywords", []),
+                commercial_keywords,
+                affiliate_domains,
+                min_score,
+            )
             all_entries.extend(parsed)
         except Exception:
             errors += 1

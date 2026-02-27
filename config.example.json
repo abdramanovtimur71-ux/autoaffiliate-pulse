@@ -14,6 +14,20 @@
     "скидка",
     "бесплатно"
   ],
+  "commercial_keywords": [
+    "deal",
+    "discount",
+    "pricing",
+    "coupon",
+    "sale",
+    "best",
+    "compare",
+    "review",
+    "скидка",
+    "цена",
+    "тариф"
+  ],
+  "min_publish_score": 4,
   "feeds": [
     "https://feeds.feedburner.com/lifehacker/full",
     "https://hnrss.org/frontpage",

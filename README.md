@@ -18,6 +18,7 @@
    - `public_base_url` (ваш домен),
    - affiliate-параметры,
    - `lead_magnet.url` и `telegram.channel_url` для блоков конверсии,
+   - `commercial_keywords` и `min_publish_score` для отбора более коммерческих материалов,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
 4. Разовый запуск:
 
