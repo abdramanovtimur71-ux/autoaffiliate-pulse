@@ -621,6 +621,50 @@ def run_once(config: Dict) -> Dict[str, int]:
     return {"created": created, "feeds_failed": errors, "fetched": len(all_entries)}
 
 
+def rebuild_all_posts(config: Dict) -> Dict[str, int]:
+    paths = ensure_dirs(config)
+    write_css(paths["assets"] / "style.css")
+    write_legal_pages(paths, config)
+
+    db_path = Path(config.get("state_db", "state.db"))
+    conn = db_connect(db_path)
+
+    rows = conn.execute(
+        """
+        SELECT guid, title, link, published_at, source, local_path
+        FROM published
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+
+    rebuilt = 0
+    for guid, title, link, published_at, source, local_path in rows:
+        entry = Entry(
+            guid=guid,
+            title=title,
+            link=link,
+            description="",
+            published_at=published_at,
+            source=source,
+            score=0,
+        )
+        monetized = apply_affiliate(entry.link, config.get("affiliate", {}))
+        html_content = render_post(entry, monetized, config)
+
+        post_path = Path(local_path)
+        if not post_path.is_absolute():
+            post_path = Path(post_path)
+        post_path.parent.mkdir(parents=True, exist_ok=True)
+        post_path.write_text(html_content, encoding="utf-8")
+        rebuilt += 1
+
+    index_html = render_index(load_recent_posts(conn), config)
+    (paths["output"] / "index.html").write_text(index_html, encoding="utf-8")
+
+    conn.close()
+    return {"rebuilt": rebuilt}
+
+
 def run_daemon(config: Dict, interval_minutes: int) -> None:
     while True:
         result = run_once(config)
@@ -636,6 +680,11 @@ def main() -> None:
     parser.add_argument("--config", default="config.json", help="Путь до config.json")
     parser.add_argument("--daemon", action="store_true", help="Бесконечный режим")
     parser.add_argument("--interval", type=int, default=180, help="Интервал в минутах")
+    parser.add_argument(
+        "--rebuild-all",
+        action="store_true",
+        help="Пересобрать все ранее опубликованные посты по текущему шаблону",
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config)
@@ -646,6 +695,11 @@ def main() -> None:
 
     if args.daemon:
         run_daemon(config, args.interval)
+        return
+
+    if args.rebuild_all:
+        result = rebuild_all_posts(config)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
         return
 
     result = run_once(config)
