@@ -235,49 +235,78 @@ def slugify(text: str) -> str:
 
 
 def render_post(entry: Entry, monetized_link: str, config: Dict) -> str:
-        cta_variants = config.get("cta_variants", ["Проверить предложение"])
-        cta_text = random.choice(cta_variants)
-        hook_variants = config.get(
-                "hook_variants",
-                [
-                        "Коротко: где здесь ценность и как это можно использовать для роста дохода.",
-                        "Практично: что попробовать сегодня, чтобы получить результат быстрее.",
-                ],
-        )
-        hook_text = random.choice(hook_variants)
-        source_domain = urllib.parse.urlparse(entry.link).netloc
-        lead_magnet = config.get("lead_magnet", {})
-        lead_title = lead_magnet.get("title", "Бонус: чек-лист внедрения")
-        lead_description = lead_magnet.get(
-                "description",
-                "Заберите мини-гайд и получите простую схему внедрения за 20 минут.",
-        )
-        lead_button = lead_magnet.get("button_text", "Получить чек-лист")
-        lead_url = lead_magnet.get("url", "")
-        telegram_channel = config.get("telegram", {}).get("channel_url", "")
-        disclaimer = config.get(
-                "affiliate_disclaimer",
-                "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
-        )
+    cta_variants = config.get("cta_variants", ["Проверить предложение"])
+    cta_text = random.choice(cta_variants)
+    hook_variants = config.get(
+        "hook_variants",
+        [
+            "Коротко: где здесь ценность и как это можно использовать для роста дохода.",
+            "Практично: что попробовать сегодня, чтобы получить результат быстрее.",
+        ],
+    )
+    hook_text = random.choice(hook_variants)
+    source_domain = urllib.parse.urlparse(entry.link).netloc
+    lead_magnet = config.get("lead_magnet", {})
+    lead_title = lead_magnet.get("title", "Бонус: чек-лист внедрения")
+    lead_description = lead_magnet.get(
+        "description",
+        "Заберите мини-гайд и получите простую схему внедрения за 20 минут.",
+    )
+    lead_button = lead_magnet.get("button_text", "Получить чек-лист")
+    lead_url = lead_magnet.get("url", "")
+    telegram_channel = config.get("telegram", {}).get("channel_url", "")
+    analytics = config.get("analytics", {})
+    goatcounter_site = analytics.get("goatcounter_site", "")
+    analytics_script = (
+        f'<script data-goatcounter="https://{html.escape(goatcounter_site)}/count" async src="//gc.zgo.at/count.js"></script>'
+        if goatcounter_site
+        else ""
+    )
+    tracking_script = (
+        """
+<script>
+document.addEventListener('click', function (event) {
+  var link = event.target.closest('a[data-track="cta"]');
+  if (!link) return;
+  if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+    var source = link.dataset.trackSource || 'unknown';
+    var label = link.dataset.trackLabel || 'cta';
+    window.goatcounter.count({
+      path: '/cta/' + source + '/' + encodeURIComponent(label),
+      title: 'CTA click: ' + label,
+      event: true
+    });
+  }
+});
+</script>
+"""
+        if goatcounter_site
+        else ""
+    )
+    disclaimer = config.get(
+        "affiliate_disclaimer",
+        "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
+    )
 
-        lead_button_html = (
-                f'<a class="cta cta-secondary" href="{html.escape(lead_url)}" target="_blank" rel="noopener">{html.escape(lead_button)}</a>'
-                if lead_url
-                else ""
-        )
-        telegram_html = (
-                f'<p class="meta">Подписка: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram канал</a></p>'
-                if telegram_channel
-                else ""
-        )
+    lead_button_html = (
+        f'<a class="cta cta-secondary" href="{html.escape(lead_url)}" target="_blank" rel="noopener" data-track="cta" data-track-source="leadmagnet" data-track-label="{html.escape(entry.title)}">{html.escape(lead_button)}</a>'
+        if lead_url
+        else ""
+    )
+    telegram_html = (
+        f'<p class="meta">Подписка: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram канал</a></p>'
+        if telegram_channel
+        else ""
+    )
 
-        return f"""<!doctype html>
+    return f"""<!doctype html>
 <html lang=\"ru\">
 <head>
     <meta charset=\"utf-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <title>{html.escape(entry.title)} | {html.escape(config['brand_name'])}</title>
     <link rel=\"stylesheet\" href=\"../assets/style.css\" />
+    {analytics_script}
 </head>
 <body>
     <main class=\"container\">
@@ -290,7 +319,7 @@ def render_post(entry: Entry, monetized_link: str, config: Dict) -> str:
         <section class=\"card\">
             <p class=\"hook\">{html.escape(hook_text)}</p>
             <p>{html.escape(entry.description or 'Краткий обзор по теме и возможностям монетизации.')}</p>
-            <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\">{html.escape(cta_text)}</a>
+            <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\" data-track=\"cta\" data-track-source=\"offer\" data-track-label=\"{html.escape(entry.title)}\">{html.escape(cta_text)}</a>
             <p class=\"disclaimer\">{html.escape(disclaimer)}</p>
         </section>
 
@@ -312,6 +341,7 @@ def render_post(entry: Entry, monetized_link: str, config: Dict) -> str:
             <a href=\"../disclaimer.html\">Affiliate Disclaimer</a>
         </footer>
     </main>
+    {tracking_script}
 </body>
 </html>
 """
@@ -340,60 +370,90 @@ h3 { margin: 0 0 8px; }
 
 
 def render_index(posts: List[Dict], config: Dict) -> str:
-    telegram_channel = config.get("telegram", {}).get("channel_url", "")
-    lead_magnet = config.get("lead_magnet", {})
-    hero_cta_label = lead_magnet.get("button_text", "Получить бонус")
-    hero_cta_url = lead_magnet.get("url", "")
-    hero_button_html = (
-        f'<a class="cta" href="{html.escape(hero_cta_url)}" target="_blank" rel="noopener">{html.escape(hero_cta_label)}</a>'
-        if hero_cta_url
-        else ""
-    )
-    hero_telegram_html = (
-        f'<p class="meta">Следить за обновлениями: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
-        if telegram_channel
-        else ""
-    )
-
-    items = []
-    for post in posts:
-        items.append(
-            f"<li><a href=\"posts/{html.escape(post['filename'])}\"><strong>{html.escape(post['title'])}</strong></a><br/><span class=\"meta\">{html.escape(post['published_at'])}</span></li>"
+        telegram_channel = config.get("telegram", {}).get("channel_url", "")
+        lead_magnet = config.get("lead_magnet", {})
+        hero_cta_label = lead_magnet.get("button_text", "Получить бонус")
+        hero_cta_url = lead_magnet.get("url", "")
+        analytics = config.get("analytics", {})
+        goatcounter_site = analytics.get("goatcounter_site", "")
+        analytics_script = (
+                f'<script data-goatcounter="https://{html.escape(goatcounter_site)}/count" async src="//gc.zgo.at/count.js"></script>'
+                if goatcounter_site
+                else ""
+        )
+        tracking_script = (
+                """
+<script>
+document.addEventListener('click', function (event) {
+    var link = event.target.closest('a[data-track="cta"]');
+    if (!link) return;
+    if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        var source = link.dataset.trackSource || 'unknown';
+        var label = link.dataset.trackLabel || 'cta';
+        window.goatcounter.count({
+            path: '/cta/' + source + '/' + encodeURIComponent(label),
+            title: 'CTA click: ' + label,
+            event: true
+        });
+    }
+});
+</script>
+"""
+                if goatcounter_site
+                else ""
+        )
+        hero_button_html = (
+                f'<a class="cta" href="{html.escape(hero_cta_url)}" target="_blank" rel="noopener" data-track="cta" data-track-source="index-hero" data-track-label="leadmagnet">{html.escape(hero_cta_label)}</a>'
+                if hero_cta_url
+                else ""
+        )
+        hero_telegram_html = (
+                f'<p class="meta">Следить за обновлениями: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
+                if telegram_channel
+                else ""
         )
 
-    posts_html = "\n".join(items) if items else "<li>Пока нет материалов. Запустите генератор позже.</li>"
+        items = []
+        for post in posts:
+                items.append(
+                        f"<li><a href=\"posts/{html.escape(post['filename'])}\"><strong>{html.escape(post['title'])}</strong></a><br/><span class=\"meta\">{html.escape(post['published_at'])}</span></li>"
+                )
 
-    return f"""<!doctype html>
+        posts_html = "\n".join(items) if items else "<li>Пока нет материалов. Запустите генератор позже.</li>"
+
+        return f"""<!doctype html>
 <html lang=\"ru\">
 <head>
-  <meta charset=\"utf-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-  <title>{html.escape(config['brand_name'])}</title>
-  <link rel=\"stylesheet\" href=\"assets/style.css\" />
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>{html.escape(config['brand_name'])}</title>
+    <link rel=\"stylesheet\" href=\"assets/style.css\" />
+    {analytics_script}
 </head>
 <body>
-  <main class=\"container\">
-    <h1>{html.escape(config['brand_name'])}</h1>
-    <p>{html.escape(config['site_tagline'])}</p>
-    <section class=\"card hero\">
-      <p class=\"hook\">Свежие инструменты и офферы для роста продуктивности и дохода.</p>
-      {hero_button_html}
-      {hero_telegram_html}
-    </section>
-    <ul class=\"post-list\">{posts_html}</ul>
+    <main class=\"container\">
+        <h1>{html.escape(config['brand_name'])}</h1>
+        <p>{html.escape(config['site_tagline'])}</p>
+        <section class=\"card hero\">
+            <p class=\"hook\">Свежие инструменты и офферы для роста продуктивности и дохода.</p>
+            {hero_button_html}
+            {hero_telegram_html}
+        </section>
+        <ul class=\"post-list\">{posts_html}</ul>
         <footer class=\"footer\">
             <a href=\"privacy.html\">Privacy Policy</a>
             <span>·</span>
             <a href=\"disclaimer.html\">Affiliate Disclaimer</a>
         </footer>
-  </main>
+    </main>
+    {tracking_script}
 </body>
 </html>
 """
 
 
 def render_legal_page(title: str, content_html: str, config: Dict) -> str:
-        return f"""<!doctype html>
+    return f"""<!doctype html>
 <html lang=\"ru\">
 <head>
     <meta charset=\"utf-8\" />
@@ -413,31 +473,31 @@ def render_legal_page(title: str, content_html: str, config: Dict) -> str:
 
 
 def write_legal_pages(paths: Dict[str, Path], config: Dict) -> None:
-        brand_name = html.escape(config.get("brand_name", "AutoAffiliate Pulse"))
-        contact_email = html.escape(config.get("legal", {}).get("contact_email", "contact@example.com"))
+    brand_name = html.escape(config.get("brand_name", "AutoAffiliate Pulse"))
+    contact_email = html.escape(config.get("legal", {}).get("contact_email", "contact@example.com"))
 
-        privacy_content = f"""
+    privacy_content = f"""
 <p>Мы уважаем вашу конфиденциальность. Сайт {brand_name} может обрабатывать технические данные (например, IP, user-agent, cookies) для аналитики и улучшения сервиса.</p>
 <p>Мы можем использовать сторонние сервисы аналитики и рекламы, которые применяют cookies в рамках своих политик.</p>
 <p>Мы не продаём персональные данные третьим лицам. По вопросам обработки данных: {contact_email}.</p>
 <p>Пользуясь сайтом, вы соглашаетесь с этой политикой конфиденциальности.</p>
 """.strip()
 
-        disclaimer_content = f"""
+    disclaimer_content = f"""
 <p>Часть ссылок на сайте {brand_name} являются партнёрскими (affiliate links). Если вы совершаете покупку по такой ссылке, мы можем получить комиссию без доплаты для вас.</p>
 <p>Материалы носят информационный характер и не являются финансовой, юридической или инвестиционной рекомендацией.</p>
 <p>Мы стремимся к точности данных, но не гарантируем актуальность цен, условий и наличия офферов у сторонних сервисов.</p>
 <p>По вопросам и претензиям: {contact_email}.</p>
 """.strip()
 
-        (paths["output"] / "privacy.html").write_text(
-                render_legal_page("Privacy Policy", privacy_content, config),
-                encoding="utf-8",
-        )
-        (paths["output"] / "disclaimer.html").write_text(
-                render_legal_page("Affiliate Disclaimer", disclaimer_content, config),
-                encoding="utf-8",
-        )
+    (paths["output"] / "privacy.html").write_text(
+    render_legal_page("Privacy Policy", privacy_content, config),
+    encoding="utf-8",
+    )
+    (paths["output"] / "disclaimer.html").write_text(
+    render_legal_page("Affiliate Disclaimer", disclaimer_content, config),
+    encoding="utf-8",
+    )
 
 
 def load_recent_posts(conn: sqlite3.Connection, limit: int = 50) -> List[Dict]:

@@ -22,9 +22,16 @@
    - `money_mode` и `money_mode_min_score` для агрессивного режима монетизации,
    - `money_mode_fallback`, чтобы при пустой выдаче автоматически смягчать фильтр,
    - `legal.contact_email` для автогенерации legal-страниц,
+   - `analytics.goatcounter_site` для трекинга кликов по CTA,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
 
 Legal-страницы `privacy.html` и `disclaimer.html` генерируются автоматически при каждом запуске.
+
+### Трекинг кликов по CTA (просто и без backend)
+
+1. Зарегистрируйте сайт в GoatCounter.
+2. Укажите в `analytics.goatcounter_site` значение вида `yourname.goatcounter.com`.
+3. После деплоя в отчётах GoatCounter будут события вида `/cta/<source>/<label>`.
 4. Разовый запуск:
 
 ```powershell
