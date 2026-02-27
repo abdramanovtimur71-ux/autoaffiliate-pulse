@@ -80,5 +80,8 @@
     "channel_url": "https://t.me/your_channel",
     "bot_token": "",
     "chat_id": ""
+  },
+  "legal": {
+    "contact_email": "contact@example.com"
   }
 }

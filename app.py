@@ -305,6 +305,12 @@ def render_post(entry: Entry, monetized_link: str, config: Dict) -> str:
             <p>Рекламный слот (вставьте AdSense/другую сеть)</p>
             <pre>&lt;!-- Ad code here --&gt;</pre>
         </section>
+
+        <footer class=\"footer\">
+            <a href=\"../privacy.html\">Privacy Policy</a>
+            <span>·</span>
+            <a href=\"../disclaimer.html\">Affiliate Disclaimer</a>
+        </footer>
     </main>
 </body>
 </html>
@@ -327,6 +333,8 @@ h3 { margin: 0 0 8px; }
 .post-list a { color: #111827; text-decoration: none; }
 .ad-slot pre { overflow-x: auto; }
 .hero { margin-bottom: 14px; }
+.footer { margin-top: 18px; color: #6b7280; font-size: 14px; }
+.footer a { color: #4f46e5; text-decoration: none; }
 """.strip()
     path.write_text(css, encoding="utf-8")
 
@@ -373,10 +381,63 @@ def render_index(posts: List[Dict], config: Dict) -> str:
       {hero_telegram_html}
     </section>
     <ul class=\"post-list\">{posts_html}</ul>
+        <footer class=\"footer\">
+            <a href=\"privacy.html\">Privacy Policy</a>
+            <span>·</span>
+            <a href=\"disclaimer.html\">Affiliate Disclaimer</a>
+        </footer>
   </main>
 </body>
 </html>
 """
+
+
+def render_legal_page(title: str, content_html: str, config: Dict) -> str:
+        return f"""<!doctype html>
+<html lang=\"ru\">
+<head>
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>{html.escape(title)} | {html.escape(config['brand_name'])}</title>
+    <link rel=\"stylesheet\" href=\"assets/style.css\" />
+</head>
+<body>
+    <main class=\"container\">
+        <a href=\"index.html\" class=\"back\">← На главную</a>
+        <h1>{html.escape(title)}</h1>
+        <section class=\"card\">{content_html}</section>
+    </main>
+</body>
+</html>
+"""
+
+
+def write_legal_pages(paths: Dict[str, Path], config: Dict) -> None:
+        brand_name = html.escape(config.get("brand_name", "AutoAffiliate Pulse"))
+        contact_email = html.escape(config.get("legal", {}).get("contact_email", "contact@example.com"))
+
+        privacy_content = f"""
+<p>Мы уважаем вашу конфиденциальность. Сайт {brand_name} может обрабатывать технические данные (например, IP, user-agent, cookies) для аналитики и улучшения сервиса.</p>
+<p>Мы можем использовать сторонние сервисы аналитики и рекламы, которые применяют cookies в рамках своих политик.</p>
+<p>Мы не продаём персональные данные третьим лицам. По вопросам обработки данных: {contact_email}.</p>
+<p>Пользуясь сайтом, вы соглашаетесь с этой политикой конфиденциальности.</p>
+""".strip()
+
+        disclaimer_content = f"""
+<p>Часть ссылок на сайте {brand_name} являются партнёрскими (affiliate links). Если вы совершаете покупку по такой ссылке, мы можем получить комиссию без доплаты для вас.</p>
+<p>Материалы носят информационный характер и не являются финансовой, юридической или инвестиционной рекомендацией.</p>
+<p>Мы стремимся к точности данных, но не гарантируем актуальность цен, условий и наличия офферов у сторонних сервисов.</p>
+<p>По вопросам и претензиям: {contact_email}.</p>
+""".strip()
+
+        (paths["output"] / "privacy.html").write_text(
+                render_legal_page("Privacy Policy", privacy_content, config),
+                encoding="utf-8",
+        )
+        (paths["output"] / "disclaimer.html").write_text(
+                render_legal_page("Affiliate Disclaimer", disclaimer_content, config),
+                encoding="utf-8",
+        )
 
 
 def load_recent_posts(conn: sqlite3.Connection, limit: int = 50) -> List[Dict]:
@@ -412,6 +473,7 @@ def post_to_telegram(config: Dict, text: str) -> None:
 def run_once(config: Dict) -> Dict[str, int]:
     paths = ensure_dirs(config)
     write_css(paths["assets"] / "style.css")
+    write_legal_pages(paths, config)
 
     db_path = Path(config.get("state_db", "state.db"))
     conn = db_connect(db_path)

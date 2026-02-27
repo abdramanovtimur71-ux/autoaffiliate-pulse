@@ -21,7 +21,10 @@
    - `commercial_keywords` и `min_publish_score` для отбора более коммерческих материалов,
    - `money_mode` и `money_mode_min_score` для агрессивного режима монетизации,
    - `money_mode_fallback`, чтобы при пустой выдаче автоматически смягчать фильтр,
+   - `legal.contact_email` для автогенерации legal-страниц,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
+
+Legal-страницы `privacy.html` и `disclaimer.html` генерируются автоматически при каждом запуске.
 4. Разовый запуск:
 
 ```powershell
