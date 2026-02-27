@@ -46,6 +46,7 @@ C:/Users/HP/AppData/Local/Programs/Python/Python314/python.exe app.py --config c
 
 - `scripts/run_autopulse.ps1` — запуск генерации с логами в `logs/autopulse.log`.
 - `scripts/setup_scheduler.ps1` — регистрация задачи планировщика.
+- `scripts/setup_autonomous.ps1` — включает полный автономный режим одной командой.
 
 Создать/обновить задачу:
 
@@ -54,6 +55,30 @@ C:/Users/HP/AppData/Local/Programs/Python/Python314/python.exe app.py --config c
 ```
 
 Имя задачи по умолчанию: `AutoAffiliatePulse-Every3Hours`.
+
+### Полный автономный режим (рекомендуется)
+
+Одна команда:
+
+```powershell
+./scripts/setup_autonomous.ps1
+```
+
+Что произойдёт автоматически:
+
+1. Если нет `config.json`, он будет создан из `config.example.json`.
+2. Будет зарегистрирована/обновлена задача планировщика.
+3. Будет выполнен немедленный пробный запуск.
+4. Дальше проект будет работать сам по расписанию.
+
+По умолчанию скрипт пытается создать задачу от имени `SYSTEM` (для работы без входа пользователя в Windows).
+Если прав администратора нет — автоматически включается безопасный fallback на текущего пользователя.
+
+Если нужно запускать только в вашей сессии пользователя:
+
+```powershell
+./scripts/setup_autonomous.ps1 -RunAsCurrentUser
+```
 
 ## Автономный режим (демон, если нужен)
 

@@ -1,0 +1,39 @@
+﻿name: CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Prepare config
+        run: cp config.example.json config.json
+
+      - name: Run generator
+        run: python app.py --config config.json
+
+      - name: Verify site output
+        run: |
+          test -f site/index.html
+          test -f site/privacy.html
+          test -f site/disclaimer.html
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site

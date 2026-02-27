@@ -60,16 +60,26 @@ def db_connect(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def fetch_url(url: str, timeout: int = 20) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "AutoAffiliatePulse/1.0"})
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        raw = response.read()
-    for encoding in ("utf-8", "cp1251", "latin-1"):
+def fetch_url(url: str, timeout: int = 20, retries: int = 3, retry_delay_sec: float = 1.5) -> str:
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max(1, retries) + 1):
         try:
-            return raw.decode(encoding)
-        except UnicodeDecodeError:
-            continue
-    return raw.decode("utf-8", errors="ignore")
+            req = urllib.request.Request(url, headers={"User-Agent": "AutoAffiliatePulse/1.0"})
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                raw = response.read()
+            for encoding in ("utf-8", "cp1251", "latin-1"):
+                try:
+                    return raw.decode(encoding)
+                except UnicodeDecodeError:
+                    continue
+            return raw.decode("utf-8", errors="ignore")
+        except Exception as error:
+            last_error = error
+            if attempt < retries:
+                time.sleep(retry_delay_sec * attempt)
+    if last_error is None:
+        raise RuntimeError("Unknown error while fetching URL")
+    raise last_error
 
 
 def compute_entry_score(
@@ -583,7 +593,8 @@ def run_once(config: Dict) -> Dict[str, int]:
                     money_require_affiliate_domain,
                 )
             all_entries.extend(parsed)
-        except Exception:
+        except Exception as error:
+            print(f"feed_error source={feed} error={type(error).__name__}: {error}")
             errors += 1
 
     all_entries.sort(key=lambda item: item.score, reverse=True)
@@ -667,11 +678,17 @@ def rebuild_all_posts(config: Dict) -> Dict[str, int]:
 
 def run_daemon(config: Dict, interval_minutes: int) -> None:
     while True:
-        result = run_once(config)
-        print(
-            f"[{dt.datetime.now().isoformat(timespec='seconds')}] "
-            f"new_posts={result['created']} fetched={result['fetched']} feed_errors={result['feeds_failed']}"
-        )
+        try:
+            result = run_once(config)
+            print(
+                f"[{dt.datetime.now().isoformat(timespec='seconds')}] "
+                f"new_posts={result['created']} fetched={result['fetched']} feed_errors={result['feeds_failed']}"
+            )
+        except Exception as error:
+            print(
+                f"[{dt.datetime.now().isoformat(timespec='seconds')}] "
+                f"daemon_error={type(error).__name__}: {error}"
+            )
         time.sleep(max(1, interval_minutes) * 60)
 
 
@@ -689,7 +706,12 @@ def main() -> None:
 
     config_path = Path(args.config)
     if not config_path.exists():
-        raise FileNotFoundError("Создайте config.json на основе config.example.json")
+        example_config_path = config_path.parent / "config.example.json"
+        if example_config_path.exists():
+            config_path.write_text(example_config_path.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"config_missing_recovered=true path={config_path}")
+        else:
+            raise FileNotFoundError("Создайте config.json на основе config.example.json")
 
     config = load_config(config_path)
 

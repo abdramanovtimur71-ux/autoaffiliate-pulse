@@ -34,7 +34,7 @@
   "money_mode_require_affiliate_domain": true,
   "money_mode_fallback": true,
   "feeds": [
-    "https://feeds.feedburner.com/lifehacker/full",
+    "https://lifehacker.com/rss",
     "https://hnrss.org/frontpage",
     "https://www.producthunt.com/feed"
   ],

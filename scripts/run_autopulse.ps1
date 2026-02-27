@@ -14,7 +14,24 @@ if ([string]::IsNullOrWhiteSpace($PythonPath)) {
         $PythonPath = $venvPython
     }
     else {
-        $PythonPath = "C:/Users/HP/AppData/Local/Programs/Python/Python314/python.exe"
+        $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+        if ($pythonCmd) {
+            $PythonPath = $pythonCmd.Source
+        }
+        else {
+            throw "Python not found. Install Python 3.10+ or create .venv"
+        }
+    }
+}
+
+$resolvedConfigPath = Join-Path $root $ConfigPath
+if (-not (Test-Path $resolvedConfigPath)) {
+    $exampleConfig = Join-Path $root "config.example.json"
+    if (Test-Path $exampleConfig) {
+        Copy-Item -Path $exampleConfig -Destination $resolvedConfigPath -Force
+    }
+    else {
+        throw "Config not found: $resolvedConfigPath and config.example.json is missing"
     }
 }
 
@@ -29,7 +46,7 @@ $stamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 "[$stamp] START run" | Out-File -FilePath $logFile -Encoding utf8 -Append
 
 try {
-    & $PythonPath "app.py" "--config" $ConfigPath *>> $logFile
+    & $PythonPath "app.py" "--config" $resolvedConfigPath *>> $logFile
     $exitCode = $LASTEXITCODE
     $stampOk = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     "[$stampOk] END run exit=$exitCode" | Out-File -FilePath $logFile -Encoding utf8 -Append
