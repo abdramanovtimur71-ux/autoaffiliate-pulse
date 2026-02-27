@@ -19,6 +19,8 @@
    - affiliate-параметры,
    - `lead_magnet.url` и `telegram.channel_url` для блоков конверсии,
    - `commercial_keywords` и `min_publish_score` для отбора более коммерческих материалов,
+   - `money_mode` и `money_mode_min_score` для агрессивного режима монетизации,
+   - `money_mode_fallback`, чтобы при пустой выдаче автоматически смягчать фильтр,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
 4. Разовый запуск:
 

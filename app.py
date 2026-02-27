@@ -97,6 +97,16 @@ def compute_entry_score(
     return score
 
 
+def contains_any_keyword(text: str, keywords: List[str]) -> bool:
+    lowered_text = text.lower()
+    return any(keyword and keyword in lowered_text for keyword in keywords)
+
+
+def extract_domain(link: str) -> str:
+    parsed = urllib.parse.urlparse(link)
+    return parsed.netloc.lower().replace("www.", "")
+
+
 def parse_rss(
     xml_text: str,
     source_url: str,
@@ -104,11 +114,16 @@ def parse_rss(
     commercial_keywords: List[str],
     affiliate_domains: List[str],
     min_score: int,
+    money_mode: bool,
+    money_mode_min_score: int,
+    require_commercial_in_title: bool,
+    require_affiliate_domain: bool,
 ) -> List[Entry]:
     root = ET.fromstring(xml_text)
     items: List[Entry] = []
     lowered_keywords = [item.lower() for item in keywords]
     lowered_commercial_keywords = [item.lower() for item in commercial_keywords]
+    active_min_score = money_mode_min_score if money_mode else min_score
 
     for node in root.findall(".//item"):
         title = (node.findtext("title") or "").strip()
@@ -120,6 +135,15 @@ def parse_rss(
         if not title or not link:
             continue
 
+        title_has_commercial = contains_any_keyword(title, lowered_commercial_keywords)
+        domain = extract_domain(link)
+        link_has_affiliate_domain = any(item and item in domain for item in affiliate_domains)
+
+        if money_mode and require_commercial_in_title and not title_has_commercial:
+            continue
+        if money_mode and require_affiliate_domain and not link_has_affiliate_domain:
+            continue
+
         score = compute_entry_score(
             title=title,
             description=description,
@@ -128,7 +152,7 @@ def parse_rss(
             commercial_keywords=lowered_commercial_keywords,
             affiliate_domains=affiliate_domains,
         )
-        if score < min_score:
+        if score < active_min_score:
             continue
 
         items.append(
@@ -400,6 +424,13 @@ def run_once(config: Dict) -> Dict[str, int]:
     ]
     commercial_keywords = config.get("commercial_keywords", [])
     min_score = int(config.get("min_publish_score", 4))
+    money_mode = bool(config.get("money_mode", False))
+    money_mode_min_score = int(config.get("money_mode_min_score", 8))
+    money_require_commercial_title = bool(
+        config.get("money_mode_require_commercial_in_title", True)
+    )
+    money_require_affiliate_domain = bool(config.get("money_mode_require_affiliate_domain", False))
+    money_mode_fallback = bool(config.get("money_mode_fallback", True))
 
     for feed in config.get("feeds", []):
         try:
@@ -411,7 +442,24 @@ def run_once(config: Dict) -> Dict[str, int]:
                 commercial_keywords,
                 affiliate_domains,
                 min_score,
+                money_mode,
+                money_mode_min_score,
+                money_require_commercial_title,
+                money_require_affiliate_domain,
             )
+            if money_mode and money_mode_fallback and not parsed:
+                parsed = parse_rss(
+                    xml_text,
+                    feed,
+                    config.get("keywords", []),
+                    commercial_keywords,
+                    affiliate_domains,
+                    min_score,
+                    False,
+                    money_mode_min_score,
+                    money_require_commercial_title,
+                    money_require_affiliate_domain,
+                )
             all_entries.extend(parsed)
         except Exception:
             errors += 1

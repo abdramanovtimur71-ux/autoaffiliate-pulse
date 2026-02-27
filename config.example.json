@@ -28,6 +28,11 @@
     "тариф"
   ],
   "min_publish_score": 4,
+  "money_mode": true,
+  "money_mode_min_score": 8,
+  "money_mode_require_commercial_in_title": true,
+  "money_mode_require_affiliate_domain": false,
+  "money_mode_fallback": true,
   "feeds": [
     "https://feeds.feedburner.com/lifehacker/full",
     "https://hnrss.org/frontpage",
