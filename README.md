@@ -129,6 +129,8 @@ C:/Users/HP/AppData/Local/Programs/Python/Python314/python.exe app.py --config c
 1. запускать генератор,
 2. деплоить папку `site/` в Cloudflare Pages.
 
+Если секреты/переменная ещё не заданы, workflow Cloudflare будет автоматически пропускаться (а не падать ошибкой).
+
 ## Публикация сайта
 
 Подходит любой static hosting: Cloudflare Pages, Netlify, GitHub Pages, Vercel static.
