@@ -635,7 +635,7 @@ document.addEventListener('click', function (event) {
 <body>
     <main class=\"container\">
         <header class=\"page-head\">
-            <a href=\"../index.html\" class=\"back\">в†ђ РќР° РіР»Р°РІРЅСѓСЋ</a>
+            <a href=\"../index.html\" class=\"back\">← На главную</a>
             <h1>{html.escape(entry.title)}</h1>
             <div class=\"tag-row\">
                 <span class=\"tag\">РСЃС‚РѕС‡РЅРёРє: {html.escape(source_domain)}</span>
@@ -1003,7 +1003,7 @@ def render_legal_page(title: str, content_html: str, config: Dict) -> str:
 </head>
 <body>
     <main class=\"container\">
-        <a href=\"index.html\" class=\"back\">в†ђ РќР° РіР»Р°РІРЅСѓСЋ</a>
+        <a href=\"index.html\" class=\"back\">← На главную</a>
         <h1>{html.escape(title)}</h1>
         <section class=\"card\">{content_html}</section>
     </main>
@@ -1149,7 +1149,7 @@ def build_telegram_run_report(config: Dict, result: Dict[str, int]) -> str:
     else:
         lines = [
             (
-                f"вњ… Р¦РёРєР»: created={result.get('created', 0)} "
+                f"✅ Цикл: created={result.get('created', 0)} "
                 f"| fetched={result.get('fetched', 0)} "
                 f"| deduped={result.get('deduped', 0)} "
                 f"| errors={result.get('feeds_failed', 0)}"
