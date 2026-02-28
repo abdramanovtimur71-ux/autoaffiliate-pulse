@@ -27,18 +27,36 @@
     "тариф",
     "промокод"
   ],
-  "min_publish_score": 4,
+  "min_publish_score": 3,
   "money_mode": true,
-  "money_mode_min_score": 10,
-  "money_mode_require_commercial_in_title": true,
-  "money_mode_require_affiliate_domain": true,
+  "money_mode_min_score": 5,
+  "money_mode_require_commercial_in_title": false,
+  "money_mode_require_affiliate_domain": false,
   "money_mode_fallback": true,
   "feeds": [
     "https://lifehacker.com/rss",
     "https://hnrss.org/frontpage",
-    "https://www.producthunt.com/feed"
+    "https://www.producthunt.com/feed",
+    "https://techcrunch.com/feed/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://www.wired.com/feed/rss",
+    "https://www.engadget.com/rss.xml",
+    "https://www.makeuseof.com/feed/",
+    "https://www.howtogeek.com/feed/",
+    "https://www.techradar.com/rss",
+    "https://www.pcworld.com/index.rss",
+    "https://www.zdnet.com/topic/artificial-intelligence/rss.xml"
   ],
-  "max_posts_per_run": 5,
+  "max_posts_per_run": 30,
+  "max_posts_per_source_domain": 4,
+  "max_posts_per_feed": 5,
+  "post_selection_min_score": 5,
+  "post_selection_adaptive_fallback": true,
+  "post_selection_fallback_min_score": 4,
+  "evergreen_republish_enabled": true,
+  "evergreen_republish_min_age_days": 1,
+  "evergreen_republish_cooldown_days": 3,
+  "evergreen_republish_max_per_run": 12,
   "cta_variants": [
     "Открыть предложение",
     "Смотреть детали",
@@ -78,6 +96,8 @@
   },
   "telegram": {
     "channel_url": "https://t.me/your_channel",
+    "notify_every_run": true,
+    "run_report_mode": "short",
     "bot_token": "",
     "chat_id": ""
   },
@@ -86,5 +106,16 @@
   },
   "analytics": {
     "goatcounter_site": "tim-lik.goatcounter.com"
+  },
+  "seo": {
+    "enabled": true,
+    "default_description": "Авто-подборка полезных находок и сделок в AI/продуктивности",
+    "default_image": "",
+    "home_keywords": [
+      "ai",
+      "productivity",
+      "tools",
+      "offers"
+    ]
   }
 }

@@ -20,12 +20,39 @@
    - `lead_magnet.url` и `telegram.channel_url` для блоков конверсии,
    - `commercial_keywords` и `min_publish_score` для отбора более коммерческих материалов,
    - `money_mode` и `money_mode_min_score` для агрессивного режима монетизации,
+   - `max_posts_per_source_domain` и `max_posts_per_feed` для распределения публикаций по разным сайтам,
    - `money_mode_fallback`, чтобы при пустой выдаче автоматически смягчать фильтр,
    - `legal.contact_email` для автогенерации legal-страниц,
    - `analytics.goatcounter_site` для трекинга кликов по CTA,
    - при необходимости `telegram.bot_token` и `telegram.chat_id`.
 
+Если указать `telegram.bot_token` и `telegram.chat_id`, система будет отправлять в Telegram:
+
+- анонсы новых постов,
+- heartbeat-отчёт по каждому циклу (`created`, `fetched`, `feeds_failed`).
+
+В расширенном режиме (`telegram.run_report_mode = detailed`) heartbeat также включает:
+`fetched_raw`, `deduped`, `selected`, `republished`, `published_total`, `duration_sec`.
+
+Управление heartbeat: `telegram.notify_every_run` (`true`/`false`).
+Формат heartbeat: `telegram.run_report_mode` (`short` или `detailed`).
+
+Безопаснее хранить токен в переменной окружения `TELEGRAM_BOT_TOKEN` (тогда `telegram.bot_token` можно оставить пустым).
+
+Для максимального охвата используйте профиль:
+
+- `max_posts_per_run`: `30`
+- `max_posts_per_source_domain`: `4`
+- `max_posts_per_feed`: `5`
+- `post_selection_min_score`: `5` (quality floor, чтобы отсеивать слабые материалы)
+- `post_selection_adaptive_fallback`: `true` (если не набралось до лимита — включается добор)
+- `post_selection_fallback_min_score`: `4` (мягкий порог только для добора)
+- `evergreen_republish_enabled`: `true` (добавляет переупаковку старых материалов при нехватке новых)
+- `evergreen_republish_min_age_days`: `1` и `evergreen_republish_cooldown_days`: `3`
+
 Legal-страницы `privacy.html` и `disclaimer.html` генерируются автоматически при каждом запуске.
+SEO-файлы `sitemap.xml` и `robots.txt` тоже генерируются автоматически.
+В HTML-страницы автоматически добавляются SEO-мета-теги: `description`, `canonical`, OpenGraph и JSON-LD schema.
 
 ### Трекинг кликов по CTA (просто и без backend)
 
@@ -47,6 +74,11 @@ C:/Users/HP/AppData/Local/Programs/Python/Python314/python.exe app.py --config c
 - `scripts/run_autopulse.ps1` — запуск генерации с логами в `logs/autopulse.log`.
 - `scripts/setup_scheduler.ps1` — регистрация задачи планировщика.
 - `scripts/setup_autonomous.ps1` — включает полный автономный режим одной командой.
+
+`run_autopulse.ps1` уже включает:
+
+- автоповтор запуска при временной ошибке (retry),
+- ротацию лога при достижении лимита размера.
 
 Создать/обновить задачу:
 
