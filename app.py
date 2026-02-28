@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import datetime as dt
 import html
 import json
@@ -973,7 +973,7 @@ document.addEventListener('click', function (event) {
             {stats_html}
         </header>
         <section class=\"card hero\">
-            <p class=\"hook\">РЎРІРµР¶РёРµ РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹ Рё РѕС„С„РµСЂС‹ РґР»СЏ СЂРѕСЃС‚Р° РїСЂРѕРґСѓРєС‚РёРІРЅРѕСЃС‚Рё Рё РґРѕС…РѕРґР°.</p>
+            <p class=\"hook\">Свежие инструменты и офферы для роста продуктивности и дохода.</p>
             {hero_button_html}
             {hero_telegram_html}
             {hot_html}
