@@ -1,4 +1,4 @@
-{
+﻿{
   "brand_name": "AutoAffiliate Pulse",
   "site_tagline": "Авто-подборка полезных находок и сделок в AI/продуктивности",
   "output_dir": "site",
@@ -70,7 +70,7 @@
     "title": "Бонус: чек-лист внедрения AI-инструментов",
     "description": "Заберите PDF и внедрите 3 инструмента за 1 день без лишних затрат.",
     "button_text": "Скачать чек-лист",
-    "url": "https://t.me/your_channel"
+    "url": "https://t.me/autopulse_affiliate_bot"
   },
   "affiliate_disclaimer": "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
   "affiliate": {
@@ -95,7 +95,7 @@
     ]
   },
   "telegram": {
-    "channel_url": "https://t.me/your_channel",
+    "channel_url": "https://t.me/autopulse_affiliate_bot",
     "notify_every_run": true,
     "run_report_mode": "short",
     "bot_token": "",
