@@ -1,6 +1,9 @@
 param(
     [string]$PythonPath = "",
-    [string]$ConfigPath = "config.json"
+    [string]$ConfigPath = "config.json",
+    [int]$MaxRetries = 2,
+    [int]$RetryDelaySec = 25,
+    [int]$LogMaxMB = 5
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,7 +27,12 @@ if ([string]::IsNullOrWhiteSpace($PythonPath)) {
     }
 }
 
-$resolvedConfigPath = Join-Path $root $ConfigPath
+$resolvedConfigPath = if ([System.IO.Path]::IsPathRooted($ConfigPath)) {
+    $ConfigPath
+}
+else {
+    Join-Path $root $ConfigPath
+}
 if (-not (Test-Path $resolvedConfigPath)) {
     $exampleConfig = Join-Path $root "config.example.json"
     if (Test-Path $exampleConfig) {
@@ -41,19 +49,50 @@ if (-not (Test-Path $logDir)) {
 }
 
 $logFile = Join-Path $logDir "autopulse.log"
+
+if (Test-Path $logFile) {
+    $logSizeBytes = (Get-Item $logFile).Length
+    $maxBytes = [Math]::Max(1, $LogMaxMB) * 1MB
+    if ($logSizeBytes -ge $maxBytes) {
+        $archiveName = "autopulse-" + (Get-Date).ToString("yyyyMMdd-HHmmss") + ".log"
+        $archivePath = Join-Path $logDir $archiveName
+        Move-Item -Path $logFile -Destination $archivePath -Force
+    }
+}
+
 $stamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 
 "[$stamp] START run" | Out-File -FilePath $logFile -Encoding utf8 -Append
 
 try {
-    & $PythonPath "app.py" "--config" $resolvedConfigPath *>> $logFile
-    $exitCode = $LASTEXITCODE
+    $maxAttempts = [Math]::Max(1, $MaxRetries + 1)
+    $finalExitCode = 1
+
+    for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+        $attemptStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        "[$attemptStamp] ATTEMPT $attempt/$maxAttempts" | Out-File -FilePath $logFile -Encoding utf8 -Append
+
+        & $PythonPath "app.py" "--config" $resolvedConfigPath *>> $logFile
+        $exitCode = $LASTEXITCODE
+        $finalExitCode = $exitCode
+
+        if ($exitCode -eq 0) {
+            break
+        }
+
+        if ($attempt -lt $maxAttempts) {
+            $retryStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+            "[$retryStamp] RETRY_WAIT ${RetryDelaySec}s after exit=$exitCode" | Out-File -FilePath $logFile -Encoding utf8 -Append
+            Start-Sleep -Seconds ([Math]::Max(1, $RetryDelaySec))
+        }
+    }
+
     $stampOk = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-    "[$stampOk] END run exit=$exitCode" | Out-File -FilePath $logFile -Encoding utf8 -Append
-    exit $exitCode
+    "[$stampOk] END run exit=$finalExitCode" | Out-File -FilePath $logFile -Encoding utf8 -Append
+    exit $finalExitCode
 }
 catch {
     $stampErr = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     "[$stampErr] ERROR $($_.Exception.Message)" | Out-File -FilePath $logFile -Encoding utf8 -Append
-    throw
+    exit 1
 }

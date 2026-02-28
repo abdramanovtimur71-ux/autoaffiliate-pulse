@@ -36,7 +36,19 @@ if (-not (Test-Path $runner)) {
 $pwshCmd = (Get-Command pwsh -ErrorAction SilentlyContinue)
 $hostPath = if ($pwshCmd) { $pwshCmd.Source } else { "powershell.exe" }
 
-$taskCommand = "`"$hostPath`" -NoProfile -ExecutionPolicy Bypass -File `"$runner`" -PythonPath `"$PythonPath`" -ConfigPath `"$resolvedConfigPath`""
+$launcherDir = Join-Path $env:ProgramData "AutoAffiliatePulse"
+if (-not (Test-Path $launcherDir)) {
+    New-Item -ItemType Directory -Path $launcherDir -Force | Out-Null
+}
+
+$launcherPath = Join-Path $launcherDir "run_task.ps1"
+$launcherContent = @"
+`$ErrorActionPreference = "Stop"
+& '$runner' -PythonPath '$PythonPath' -ConfigPath '$resolvedConfigPath'
+"@
+Set-Content -Path $launcherPath -Value $launcherContent -Encoding utf8
+
+$taskCommand = "`"$hostPath`" -NoProfile -ExecutionPolicy Bypass -File `"$launcherPath`""
 
 function New-ScheduledTaskEntry {
     param(
