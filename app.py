@@ -33,8 +33,8 @@ def normalize_config(config: Dict) -> Dict:
         normalized.get("brand_name", "AutoAffiliate Pulse") or "AutoAffiliate Pulse"
     ).strip()
     normalized["site_tagline"] = str(
-        normalized.get("site_tagline", "Авто-подборка полезных находок и сделок")
-        or "Авто-подборка полезных находок и сделок"
+        normalized.get("site_tagline", "РђРІС‚Рѕ-РїРѕРґР±РѕСЂРєР° РїРѕР»РµР·РЅС‹С… РЅР°С…РѕРґРѕРє Рё СЃРґРµР»РѕРє")
+        or "РђРІС‚Рѕ-РїРѕРґР±РѕСЂРєР° РїРѕР»РµР·РЅС‹С… РЅР°С…РѕРґРѕРє Рё СЃРґРµР»РѕРє"
     ).strip()
 
     output_dir = str(normalized.get("output_dir", "site") or "site").strip()
@@ -157,7 +157,7 @@ def build_absolute_url(base_url: str, relative_path: str) -> str:
 def text_fingerprint(value: str) -> str:
     lowered = str(value or "").lower()
     lowered = re.sub(r"\s+", " ", lowered)
-    lowered = re.sub(r"[^a-z0-9а-яё ]+", "", lowered)
+    lowered = re.sub(r"[^a-z0-9Р°-СЏС‘ ]+", "", lowered)
     return lowered.strip()
 
 
@@ -192,11 +192,11 @@ def build_seo_description(raw_text: str, fallback: str, max_len: int = 165) -> s
     value = strip_html(raw_text or "").strip() or str(fallback or "").strip()
     if len(value) <= max_len:
         return value
-    return value[: max_len - 1].rstrip() + "…"
+    return value[: max_len - 1].rstrip() + "вЂ¦"
 
 
 def load_config(path: Path) -> Dict:
-    with path.open("r", encoding="utf-8") as file:
+    with path.open("r", encoding="utf-8-sig") as file:
         return normalize_config(json.load(file))
 
 
@@ -499,30 +499,30 @@ def save_published(conn: sqlite3.Connection, entry: Entry, local_path: str) -> N
 
 
 def slugify(text: str) -> str:
-    value = re.sub(r"[^a-zA-Z0-9а-яА-ЯёЁ]+", "-", text.lower()).strip("-")
+    value = re.sub(r"[^a-zA-Z0-9Р°-СЏРђ-РЇС‘РЃ]+", "-", text.lower()).strip("-")
     value = value[:80].strip("-")
     return value or f"post-{int(time.time())}"
 
 
 def render_post(entry: Entry, monetized_link: str, config: Dict, filename: str = "") -> str:
-    cta_variants = config.get("cta_variants", ["Проверить предложение"])
+    cta_variants = config.get("cta_variants", ["РџСЂРѕРІРµСЂРёС‚СЊ РїСЂРµРґР»РѕР¶РµРЅРёРµ"])
     cta_text = random.choice(cta_variants)
     hook_variants = config.get(
         "hook_variants",
         [
-            "Коротко: где здесь ценность и как это можно использовать для роста дохода.",
-            "Практично: что попробовать сегодня, чтобы получить результат быстрее.",
+            "РљРѕСЂРѕС‚РєРѕ: РіРґРµ Р·РґРµСЃСЊ С†РµРЅРЅРѕСЃС‚СЊ Рё РєР°Рє СЌС‚Рѕ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР»СЏ СЂРѕСЃС‚Р° РґРѕС…РѕРґР°.",
+            "РџСЂР°РєС‚РёС‡РЅРѕ: С‡С‚Рѕ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ СЃРµРіРѕРґРЅСЏ, С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚ Р±С‹СЃС‚СЂРµРµ.",
         ],
     )
     hook_text = random.choice(hook_variants)
     source_domain = urllib.parse.urlparse(entry.link).netloc
     lead_magnet = config.get("lead_magnet", {})
-    lead_title = lead_magnet.get("title", "Бонус: чек-лист внедрения")
+    lead_title = lead_magnet.get("title", "Р‘РѕРЅСѓСЃ: С‡РµРє-Р»РёСЃС‚ РІРЅРµРґСЂРµРЅРёСЏ")
     lead_description = lead_magnet.get(
         "description",
-        "Заберите мини-гайд и получите простую схему внедрения за 20 минут.",
+        "Р—Р°Р±РµСЂРёС‚Рµ РјРёРЅРё-РіР°Р№Рґ Рё РїРѕР»СѓС‡РёС‚Рµ РїСЂРѕСЃС‚СѓСЋ СЃС…РµРјСѓ РІРЅРµРґСЂРµРЅРёСЏ Р·Р° 20 РјРёРЅСѓС‚.",
     )
-    lead_button = lead_magnet.get("button_text", "Получить чек-лист")
+    lead_button = lead_magnet.get("button_text", "РџРѕР»СѓС‡РёС‚СЊ С‡РµРє-Р»РёСЃС‚")
     lead_url = lead_magnet.get("url", "")
     telegram_channel = config.get("telegram", {}).get("channel_url", "")
     analytics = config.get("analytics", {})
@@ -567,7 +567,7 @@ document.addEventListener('click', function (event) {
     )
     disclaimer = config.get(
         "affiliate_disclaimer",
-        "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
+        "РњР°С‚РµСЂРёР°Р» РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РїР°СЂС‚РЅРµСЂСЃРєРёРµ СЃСЃС‹Р»РєРё. РњС‹ РјРѕР¶РµРј РїРѕР»СѓС‡Р°С‚СЊ РєРѕРјРёСЃСЃРёСЋ Р±РµР· РґРѕРїР»Р°С‚С‹ РґР»СЏ РІР°СЃ.",
     )
 
     lead_button_html = (
@@ -576,7 +576,7 @@ document.addEventListener('click', function (event) {
         else ""
     )
     telegram_html = (
-        f'<p class="meta">Подписка: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram канал</a></p>'
+        f'<p class="meta">РџРѕРґРїРёСЃРєР°: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram РєР°РЅР°Р»</a></p>'
         if telegram_channel
         else ""
     )
@@ -635,17 +635,17 @@ document.addEventListener('click', function (event) {
 <body>
     <main class=\"container\">
         <header class=\"page-head\">
-            <a href=\"../index.html\" class=\"back\">← На главную</a>
+            <a href=\"../index.html\" class=\"back\">в†ђ РќР° РіР»Р°РІРЅСѓСЋ</a>
             <h1>{html.escape(entry.title)}</h1>
             <div class=\"tag-row\">
-                <span class=\"tag\">Источник: {html.escape(source_domain)}</span>
+                <span class=\"tag\">РСЃС‚РѕС‡РЅРёРє: {html.escape(source_domain)}</span>
                 <span class=\"tag\">{html.escape(entry.published_at)}</span>
             </div>
         </header>
 
         <section class=\"card spotlight\">
             <p class=\"hook\">{html.escape(hook_text)}</p>
-            <p class=\"lead\">{html.escape(entry.description or 'Краткий обзор по теме и возможностям монетизации.')}</p>
+            <p class=\"lead\">{html.escape(entry.description or 'РљСЂР°С‚РєРёР№ РѕР±Р·РѕСЂ РїРѕ С‚РµРјРµ Рё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЏРј РјРѕРЅРµС‚РёР·Р°С†РёРё.')}</p>
             <div class=\"actions\">
                 <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\" data-track=\"cta\" data-track-source=\"offer\" data-track-label=\"{html.escape(entry.title)}\">{html.escape(cta_text)}</a>
             </div>
@@ -660,13 +660,13 @@ document.addEventListener('click', function (event) {
         </section>
 
         <section class=\"ad-slot\">
-            <p>Рекламный слот (вставьте AdSense/другую сеть)</p>
+            <p>Р РµРєР»Р°РјРЅС‹Р№ СЃР»РѕС‚ (РІСЃС‚Р°РІСЊС‚Рµ AdSense/РґСЂСѓРіСѓСЋ СЃРµС‚СЊ)</p>
             <pre>&lt;!-- Ad code here --&gt;</pre>
         </section>
 
         <footer class=\"footer\">
             <a href=\"../privacy.html\">Privacy Policy</a>
-            <span>·</span>
+            <span>В·</span>
             <a href=\"../disclaimer.html\">Affiliate Disclaimer</a>
         </footer>
     </main>
@@ -802,13 +802,13 @@ p { line-height: 1.6; }
 .footer { margin-top: 22px; color: #6b7280; font-size: 14px; }
 .footer a { color: #4f46e5; text-decoration: none; }
 """.strip()
-    path.write_text(css, encoding="utf-8")
+    path.write_text(css, encoding="utf-8-sig")
 
 
 def render_index(posts: List[Dict], config: Dict) -> str:
     telegram_channel = config.get("telegram", {}).get("channel_url", "")
     lead_magnet = config.get("lead_magnet", {})
-    hero_cta_label = lead_magnet.get("button_text", "Получить бонус")
+    hero_cta_label = lead_magnet.get("button_text", "РџРѕР»СѓС‡РёС‚СЊ Р±РѕРЅСѓСЃ")
     hero_cta_url = lead_magnet.get("url", "")
     analytics = config.get("analytics", {})
     goatcounter_site = analytics.get("goatcounter_site", "")
@@ -857,13 +857,13 @@ document.addEventListener('click', function (event) {
         else ""
     )
     hero_telegram_html = (
-        f'<p class="meta">Следить за обновлениями: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
+        f'<p class="meta">РЎР»РµРґРёС‚СЊ Р·Р° РѕР±РЅРѕРІР»РµРЅРёСЏРјРё: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
         if telegram_channel
         else ""
     )
 
     stats_html = (
-        f'<div class="stats"><span class="stat">Постов: {len(posts)}</span><span class="stat">Обновляется автоматически</span><span class="stat">Тема: AI / Productivity</span></div>'
+        f'<div class="stats"><span class="stat">РџРѕСЃС‚РѕРІ: {len(posts)}</span><span class="stat">РћР±РЅРѕРІР»СЏРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё</span><span class="stat">РўРµРјР°: AI / Productivity</span></div>'
     )
 
     source_counts: Dict[str, int] = {}
@@ -873,10 +873,10 @@ document.addEventListener('click', function (event) {
             source_counts[source_domain] = source_counts.get(source_domain, 0) + 1
     top_sources = sorted(source_counts.items(), key=lambda item: item[1], reverse=True)[:6]
     source_chips_html = "".join(
-        f'<span class="tag">{html.escape(domain)} · {count}</span>' for domain, count in top_sources
+        f'<span class="tag">{html.escape(domain)} В· {count}</span>' for domain, count in top_sources
     )
     trust_block_html = (
-        f'<section class="card"><h3>Проверенные источники</h3><p class="meta">Лента собирается из нескольких доменов, чтобы не зависеть от одного сайта.</p><div class="tag-row">{source_chips_html}</div></section>'
+        f'<section class="card"><h3>РџСЂРѕРІРµСЂРµРЅРЅС‹Рµ РёСЃС‚РѕС‡РЅРёРєРё</h3><p class="meta">Р›РµРЅС‚Р° СЃРѕР±РёСЂР°РµС‚СЃСЏ РёР· РЅРµСЃРєРѕР»СЊРєРёС… РґРѕРјРµРЅРѕРІ, С‡С‚РѕР±С‹ РЅРµ Р·Р°РІРёСЃРµС‚СЊ РѕС‚ РѕРґРЅРѕРіРѕ СЃР°Р№С‚Р°.</p><div class="tag-row">{source_chips_html}</div></section>'
         if source_chips_html
         else ""
     )
@@ -885,7 +885,7 @@ document.addEventListener('click', function (event) {
         ("AI", "ai", ["ai", "openai", "claude", "copilot", "llm", "gpt"]),
         ("SaaS", "saas", ["saas", "startup", "tool", "platform", "software"]),
         ("Deal", "deal", ["deal", "discount", "sale", "promo", "coupon", "off"]),
-        ("Free", "free", ["free", "бесплатно"]),
+        ("Free", "free", ["free", "Р±РµСЃРїР»Р°С‚РЅРѕ"]),
         ("Show HN", "showhn", ["show hn"]),
     ]
 
@@ -904,7 +904,7 @@ document.addEventListener('click', function (event) {
     items = []
     for post in posts:
         items.append(
-            f"<li><a href=\"posts/{html.escape(post['filename'])}\"><h3 class=\"post-title\">{html.escape(post['title'])}</h3><div class=\"post-meta\"><span class=\"tag\">{html.escape(post['published_at'])}</span><span class=\"tag\">Читать обзор</span></div></a></li>"
+            f"<li><a href=\"posts/{html.escape(post['filename'])}\"><h3 class=\"post-title\">{html.escape(post['title'])}</h3><div class=\"post-meta\"><span class=\"tag\">{html.escape(post['published_at'])}</span><span class=\"tag\">Р§РёС‚Р°С‚СЊ РѕР±Р·РѕСЂ</span></div></a></li>"
         )
 
     hot_items = []
@@ -914,11 +914,11 @@ document.addEventListener('click', function (event) {
             for item in get_hot_badges(post["title"])
         )
         hot_items.append(
-            f"<article class=\"hot-item\"><div class=\"hot-kicker\">Горячий оффер #{index}</div><div class=\"hot-badges\">{badge_html}</div><a href=\"posts/{html.escape(post['filename'])}\"><h4 class=\"hot-title\">{html.escape(post['title'])}</h4></a><a class=\"hot-link\" href=\"posts/{html.escape(post['filename'])}\" data-track=\"cta\" data-track-source=\"hot-offer\" data-track-label=\"{html.escape(post['title'])}\">Открыть ↗</a></article>"
+            f"<article class=\"hot-item\"><div class=\"hot-kicker\">Р“РѕСЂСЏС‡РёР№ РѕС„С„РµСЂ #{index}</div><div class=\"hot-badges\">{badge_html}</div><a href=\"posts/{html.escape(post['filename'])}\"><h4 class=\"hot-title\">{html.escape(post['title'])}</h4></a><a class=\"hot-link\" href=\"posts/{html.escape(post['filename'])}\" data-track=\"cta\" data-track-source=\"hot-offer\" data-track-label=\"{html.escape(post['title'])}\">РћС‚РєСЂС‹С‚СЊ в†—</a></article>"
         )
 
     hot_html = f'<div class="hot-grid">{"".join(hot_items)}</div>' if hot_items else ""
-    posts_html = "\n".join(items) if items else "<li>Пока нет материалов. Запустите генератор позже.</li>"
+    posts_html = "\n".join(items) if items else "<li>РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ. Р—Р°РїСѓСЃС‚РёС‚Рµ РіРµРЅРµСЂР°С‚РѕСЂ РїРѕР·Р¶Рµ.</li>"
 
     seo_tags = ""
     home_json_ld = ""
@@ -973,7 +973,7 @@ document.addEventListener('click', function (event) {
             {stats_html}
         </header>
         <section class=\"card hero\">
-            <p class=\"hook\">Свежие инструменты и офферы для роста продуктивности и дохода.</p>
+            <p class=\"hook\">РЎРІРµР¶РёРµ РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹ Рё РѕС„С„РµСЂС‹ РґР»СЏ СЂРѕСЃС‚Р° РїСЂРѕРґСѓРєС‚РёРІРЅРѕСЃС‚Рё Рё РґРѕС…РѕРґР°.</p>
             {hero_button_html}
             {hero_telegram_html}
             {hot_html}
@@ -982,7 +982,7 @@ document.addEventListener('click', function (event) {
         <ul class=\"post-list\">{posts_html}</ul>
         <footer class=\"footer\">
             <a href=\"privacy.html\">Privacy Policy</a>
-            <span>·</span>
+            <span>В·</span>
             <a href=\"disclaimer.html\">Affiliate Disclaimer</a>
         </footer>
     </main>
@@ -1003,7 +1003,7 @@ def render_legal_page(title: str, content_html: str, config: Dict) -> str:
 </head>
 <body>
     <main class=\"container\">
-        <a href=\"index.html\" class=\"back\">← На главную</a>
+        <a href=\"index.html\" class=\"back\">в†ђ РќР° РіР»Р°РІРЅСѓСЋ</a>
         <h1>{html.escape(title)}</h1>
         <section class=\"card\">{content_html}</section>
     </main>
@@ -1017,26 +1017,26 @@ def write_legal_pages(paths: Dict[str, Path], config: Dict) -> None:
     contact_email = html.escape(config.get("legal", {}).get("contact_email", "contact@example.com"))
 
     privacy_content = f"""
-<p>Мы уважаем вашу конфиденциальность. Сайт {brand_name} может обрабатывать технические данные (например, IP, user-agent, cookies) для аналитики и улучшения сервиса.</p>
-<p>Мы можем использовать сторонние сервисы аналитики и рекламы, которые применяют cookies в рамках своих политик.</p>
-<p>Мы не продаём персональные данные третьим лицам. По вопросам обработки данных: {contact_email}.</p>
-<p>Пользуясь сайтом, вы соглашаетесь с этой политикой конфиденциальности.</p>
+<p>РњС‹ СѓРІР°Р¶Р°РµРј РІР°С€Сѓ РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚СЊ. РЎР°Р№С‚ {brand_name} РјРѕР¶РµС‚ РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ С‚РµС…РЅРёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ (РЅР°РїСЂРёРјРµСЂ, IP, user-agent, cookies) РґР»СЏ Р°РЅР°Р»РёС‚РёРєРё Рё СѓР»СѓС‡С€РµРЅРёСЏ СЃРµСЂРІРёСЃР°.</p>
+<p>РњС‹ РјРѕР¶РµРј РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃС‚РѕСЂРѕРЅРЅРёРµ СЃРµСЂРІРёСЃС‹ Р°РЅР°Р»РёС‚РёРєРё Рё СЂРµРєР»Р°РјС‹, РєРѕС‚РѕСЂС‹Рµ РїСЂРёРјРµРЅСЏСЋС‚ cookies РІ СЂР°РјРєР°С… СЃРІРѕРёС… РїРѕР»РёС‚РёРє.</p>
+<p>РњС‹ РЅРµ РїСЂРѕРґР°С‘Рј РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ С‚СЂРµС‚СЊРёРј Р»РёС†Р°Рј. РџРѕ РІРѕРїСЂРѕСЃР°Рј РѕР±СЂР°Р±РѕС‚РєРё РґР°РЅРЅС‹С…: {contact_email}.</p>
+<p>РџРѕР»СЊР·СѓСЏСЃСЊ СЃР°Р№С‚РѕРј, РІС‹ СЃРѕРіР»Р°С€Р°РµС‚РµСЃСЊ СЃ СЌС‚РѕР№ РїРѕР»РёС‚РёРєРѕР№ РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё.</p>
 """.strip()
 
     disclaimer_content = f"""
-<p>Часть ссылок на сайте {brand_name} являются партнёрскими (affiliate links). Если вы совершаете покупку по такой ссылке, мы можем получить комиссию без доплаты для вас.</p>
-<p>Материалы носят информационный характер и не являются финансовой, юридической или инвестиционной рекомендацией.</p>
-<p>Мы стремимся к точности данных, но не гарантируем актуальность цен, условий и наличия офферов у сторонних сервисов.</p>
-<p>По вопросам и претензиям: {contact_email}.</p>
+<p>Р§Р°СЃС‚СЊ СЃСЃС‹Р»РѕРє РЅР° СЃР°Р№С‚Рµ {brand_name} СЏРІР»СЏСЋС‚СЃСЏ РїР°СЂС‚РЅС‘СЂСЃРєРёРјРё (affiliate links). Р•СЃР»Рё РІС‹ СЃРѕРІРµСЂС€Р°РµС‚Рµ РїРѕРєСѓРїРєСѓ РїРѕ С‚Р°РєРѕР№ СЃСЃС‹Р»РєРµ, РјС‹ РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕРјРёСЃСЃРёСЋ Р±РµР· РґРѕРїР»Р°С‚С‹ РґР»СЏ РІР°СЃ.</p>
+<p>РњР°С‚РµСЂРёР°Р»С‹ РЅРѕСЃСЏС‚ РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Р№ С…Р°СЂР°РєС‚РµСЂ Рё РЅРµ СЏРІР»СЏСЋС‚СЃСЏ С„РёРЅР°РЅСЃРѕРІРѕР№, СЋСЂРёРґРёС‡РµСЃРєРѕР№ РёР»Рё РёРЅРІРµСЃС‚РёС†РёРѕРЅРЅРѕР№ СЂРµРєРѕРјРµРЅРґР°С†РёРµР№.</p>
+<p>РњС‹ СЃС‚СЂРµРјРёРјСЃСЏ Рє С‚РѕС‡РЅРѕСЃС‚Рё РґР°РЅРЅС‹С…, РЅРѕ РЅРµ РіР°СЂР°РЅС‚РёСЂСѓРµРј Р°РєС‚СѓР°Р»СЊРЅРѕСЃС‚СЊ С†РµРЅ, СѓСЃР»РѕРІРёР№ Рё РЅР°Р»РёС‡РёСЏ РѕС„С„РµСЂРѕРІ Сѓ СЃС‚РѕСЂРѕРЅРЅРёС… СЃРµСЂРІРёСЃРѕРІ.</p>
+<p>РџРѕ РІРѕРїСЂРѕСЃР°Рј Рё РїСЂРµС‚РµРЅР·РёСЏРј: {contact_email}.</p>
 """.strip()
 
     (paths["output"] / "privacy.html").write_text(
     render_legal_page("Privacy Policy", privacy_content, config),
-    encoding="utf-8",
+    encoding="utf-8-sig",
     )
     (paths["output"] / "disclaimer.html").write_text(
     render_legal_page("Affiliate Disclaimer", disclaimer_content, config),
-    encoding="utf-8",
+    encoding="utf-8-sig",
     )
 
 
@@ -1088,13 +1088,13 @@ def write_seo_files(paths: Dict[str, Path], posts: List[Dict], config: Dict) -> 
 
     sitemap_xml = "\n".join(
         [
-            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<?xml version="1.0" encoding="utf-8-sig"?>',
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
             *sitemap_urls,
             "</urlset>",
         ]
     )
-    (paths["output"] / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
+    (paths["output"] / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8-sig")
 
     robots_lines = [
         "User-agent: *",
@@ -1102,7 +1102,7 @@ def write_seo_files(paths: Dict[str, Path], posts: List[Dict], config: Dict) -> 
     ]
     if base_url:
         robots_lines.append(f"Sitemap: {build_absolute_url(base_url, 'sitemap.xml')}")
-    (paths["output"] / "robots.txt").write_text("\n".join(robots_lines) + "\n", encoding="utf-8")
+    (paths["output"] / "robots.txt").write_text("\n".join(robots_lines) + "\n", encoding="utf-8-sig")
 
 
 def post_to_telegram(config: Dict, text: str) -> None:
@@ -1135,7 +1135,7 @@ def build_telegram_run_report(config: Dict, result: Dict[str, int]) -> str:
 
     if report_mode == "detailed":
         lines = [
-            f"{brand}: цикл завершён",
+            f"{brand}: С†РёРєР» Р·Р°РІРµСЂС€С‘РЅ",
             f"created={result.get('created', 0)}",
             f"fetched={result.get('fetched', 0)}",
             f"fetched_raw={result.get('fetched_raw', 0)}",
@@ -1149,7 +1149,7 @@ def build_telegram_run_report(config: Dict, result: Dict[str, int]) -> str:
     else:
         lines = [
             (
-                f"✅ Цикл: created={result.get('created', 0)} "
+                f"вњ… Р¦РёРєР»: created={result.get('created', 0)} "
                 f"| fetched={result.get('fetched', 0)} "
                 f"| deduped={result.get('deduped', 0)} "
                 f"| errors={result.get('feeds_failed', 0)}"
@@ -1322,7 +1322,7 @@ def run_once(config: Dict) -> Dict[str, int]:
             unique_suffix = int(time.time()) + len(republished_original_guids)
             entry = Entry(
                 guid=f"{item['guid']}#republish-{unique_suffix}",
-                title=f"{item['title']} (обновлено)",
+                title=f"{item['title']} (РѕР±РЅРѕРІР»РµРЅРѕ)",
                 link=item["link"],
                 description="",
                 published_at=dt.datetime.now(dt.UTC).isoformat(),
@@ -1347,7 +1347,7 @@ def run_once(config: Dict) -> Dict[str, int]:
         post_path = paths["pages"] / filename
 
         html_content = render_post(entry, monetized, config, filename=filename)
-        post_path.write_text(html_content, encoding="utf-8")
+        post_path.write_text(html_content, encoding="utf-8-sig")
 
         save_published(conn, entry, str(post_path))
         created += 1
@@ -1362,7 +1362,7 @@ def run_once(config: Dict) -> Dict[str, int]:
 
     posts = load_recent_posts(conn)
     index_html = render_index(posts, config)
-    (paths["output"] / "index.html").write_text(index_html, encoding="utf-8")
+    (paths["output"] / "index.html").write_text(index_html, encoding="utf-8-sig")
     write_seo_files(paths, posts, config)
 
     total_published = conn.execute("SELECT COUNT(*) FROM published").fetchone()[0]
@@ -1427,12 +1427,12 @@ def rebuild_all_posts(config: Dict) -> Dict[str, int]:
         if post_path.name != filename:
             post_path = post_path.with_name(filename)
         post_path.parent.mkdir(parents=True, exist_ok=True)
-        post_path.write_text(html_content, encoding="utf-8")
+        post_path.write_text(html_content, encoding="utf-8-sig")
         rebuilt += 1
 
     posts = load_recent_posts(conn)
     index_html = render_index(posts, config)
-    (paths["output"] / "index.html").write_text(index_html, encoding="utf-8")
+    (paths["output"] / "index.html").write_text(index_html, encoding="utf-8-sig")
     write_seo_files(paths, posts, config)
 
     conn.close()
@@ -1457,13 +1457,13 @@ def run_daemon(config: Dict, interval_minutes: int) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="AutoAffiliate Pulse")
-    parser.add_argument("--config", default="config.json", help="Путь до config.json")
-    parser.add_argument("--daemon", action="store_true", help="Бесконечный режим")
-    parser.add_argument("--interval", type=int, default=180, help="Интервал в минутах")
+    parser.add_argument("--config", default="config.json", help="РџСѓС‚СЊ РґРѕ config.json")
+    parser.add_argument("--daemon", action="store_true", help="Р‘РµСЃРєРѕРЅРµС‡РЅС‹Р№ СЂРµР¶РёРј")
+    parser.add_argument("--interval", type=int, default=180, help="РРЅС‚РµСЂРІР°Р» РІ РјРёРЅСѓС‚Р°С…")
     parser.add_argument(
         "--rebuild-all",
         action="store_true",
-        help="Пересобрать все ранее опубликованные посты по текущему шаблону",
+        help="РџРµСЂРµСЃРѕР±СЂР°С‚СЊ РІСЃРµ СЂР°РЅРµРµ РѕРїСѓР±Р»РёРєРѕРІР°РЅРЅС‹Рµ РїРѕСЃС‚С‹ РїРѕ С‚РµРєСѓС‰РµРјСѓ С€Р°Р±Р»РѕРЅСѓ",
     )
     args = parser.parse_args()
 
@@ -1471,10 +1471,10 @@ def main() -> None:
     if not config_path.exists():
         example_config_path = config_path.parent / "config.example.json"
         if example_config_path.exists():
-            config_path.write_text(example_config_path.read_text(encoding="utf-8"), encoding="utf-8")
+            config_path.write_text(example_config_path.read_text(encoding="utf-8-sig"), encoding="utf-8-sig")
             print(f"config_missing_recovered=true path={config_path}")
         else:
-            raise FileNotFoundError("Создайте config.json на основе config.example.json")
+            raise FileNotFoundError("РЎРѕР·РґР°Р№С‚Рµ config.json РЅР° РѕСЃРЅРѕРІРµ config.example.json")
 
     config = load_config(config_path)
 
