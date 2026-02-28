@@ -499,7 +499,7 @@ def save_published(conn: sqlite3.Connection, entry: Entry, local_path: str) -> N
 
 
 def slugify(text: str) -> str:
-    value = re.sub(r"[^a-zA-Z0-9Р°-СЏРђ-РЇС‘РЃ]+", "-", text.lower()).strip("-")
+    value = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     value = value[:80].strip("-")
     return value or f"post-{int(time.time())}"
 
