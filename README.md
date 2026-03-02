@@ -59,6 +59,20 @@ SEO-файлы `sitemap.xml` и `robots.txt` тоже генерируются �
 1. Зарегистрируйте сайт в GoatCounter.
 2. Укажите в `analytics.goatcounter_site` значение вида `yourname.goatcounter.com`.
 3. После деплоя в отчётах GoatCounter будут события вида `/cta/<source>/<label>`.
+
+### Проверка, что деньги реально будут начисляться
+
+Проверить конфиг монетизации:
+
+```powershell
+python app.py --config config.json --monetization-check-only
+```
+
+Запуск в строгом режиме (упадёт, если остались `YOUR_*` и другие проблемы):
+
+```powershell
+python app.py --config config.json --strict-monetization
+```
 4. Разовый запуск:
 
 ```powershell

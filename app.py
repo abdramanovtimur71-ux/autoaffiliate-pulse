@@ -505,24 +505,24 @@ def slugify(text: str) -> str:
 
 
 def render_post(entry: Entry, monetized_link: str, config: Dict, filename: str = "") -> str:
-    cta_variants = config.get("cta_variants", ["РџСЂРѕРІРµСЂРёС‚СЊ РїСЂРµРґР»РѕР¶РµРЅРёРµ"])
+    cta_variants = config.get("cta_variants", ["Проверить предложение"])
     cta_text = random.choice(cta_variants)
     hook_variants = config.get(
         "hook_variants",
         [
-            "РљРѕСЂРѕС‚РєРѕ: РіРґРµ Р·РґРµСЃСЊ С†РµРЅРЅРѕСЃС‚СЊ Рё РєР°Рє СЌС‚Рѕ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР»СЏ СЂРѕСЃС‚Р° РґРѕС…РѕРґР°.",
-            "РџСЂР°РєС‚РёС‡РЅРѕ: С‡С‚Рѕ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ СЃРµРіРѕРґРЅСЏ, С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚ Р±С‹СЃС‚СЂРµРµ.",
+            "Коротко: в чем ценность оффера и как применить его с пользой.",
+            "Практично: что можно запустить уже сегодня для быстрого результата.",
         ],
     )
     hook_text = random.choice(hook_variants)
     source_domain = urllib.parse.urlparse(entry.link).netloc
     lead_magnet = config.get("lead_magnet", {})
-    lead_title = lead_magnet.get("title", "Р‘РѕРЅСѓСЃ: С‡РµРє-Р»РёСЃС‚ РІРЅРµРґСЂРµРЅРёСЏ")
+    lead_title = lead_magnet.get("title", "Бонус: чек-лист внедрения")
     lead_description = lead_magnet.get(
         "description",
-        "Р—Р°Р±РµСЂРёС‚Рµ РјРёРЅРё-РіР°Р№Рґ Рё РїРѕР»СѓС‡РёС‚Рµ РїСЂРѕСЃС‚СѓСЋ СЃС…РµРјСѓ РІРЅРµРґСЂРµРЅРёСЏ Р·Р° 20 РјРёРЅСѓС‚.",
+        "Заберите мини-гайд и получите простую схему внедрения за 20 минут.",
     )
-    lead_button = lead_magnet.get("button_text", "РџРѕР»СѓС‡РёС‚СЊ С‡РµРє-Р»РёСЃС‚")
+    lead_button = lead_magnet.get("button_text", "Получить чек-лист")
     lead_url = lead_magnet.get("url", "")
     telegram_channel = config.get("telegram", {}).get("channel_url", "")
     analytics = config.get("analytics", {})
@@ -567,7 +567,7 @@ document.addEventListener('click', function (event) {
     )
     disclaimer = config.get(
         "affiliate_disclaimer",
-        "РњР°С‚РµСЂРёР°Р» РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РїР°СЂС‚РЅРµСЂСЃРєРёРµ СЃСЃС‹Р»РєРё. РњС‹ РјРѕР¶РµРј РїРѕР»СѓС‡Р°С‚СЊ РєРѕРјРёСЃСЃРёСЋ Р±РµР· РґРѕРїР»Р°С‚С‹ РґР»СЏ РІР°СЃ.",
+        "Материал может содержать партнерские ссылки. Мы можем получать комиссию без доплаты для вас.",
     )
 
     lead_button_html = (
@@ -576,7 +576,7 @@ document.addEventListener('click', function (event) {
         else ""
     )
     telegram_html = (
-        f'<p class="meta">РџРѕРґРїРёСЃРєР°: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram РєР°РЅР°Р»</a></p>'
+        f'<p class="meta">Подписка: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram РєР°РЅР°Р»</a></p>'
         if telegram_channel
         else ""
     )
@@ -638,14 +638,14 @@ document.addEventListener('click', function (event) {
             <a href=\"../index.html\" class=\"back\">← На главную</a>
             <h1>{html.escape(entry.title)}</h1>
             <div class=\"tag-row\">
-                <span class=\"tag\">РСЃС‚РѕС‡РЅРёРє: {html.escape(source_domain)}</span>
+                <span class=\"tag\">Источник: {html.escape(source_domain)}</span>
                 <span class=\"tag\">{html.escape(entry.published_at)}</span>
             </div>
         </header>
 
         <section class=\"card spotlight\">
             <p class=\"hook\">{html.escape(hook_text)}</p>
-            <p class=\"lead\">{html.escape(entry.description or 'РљСЂР°С‚РєРёР№ РѕР±Р·РѕСЂ РїРѕ С‚РµРјРµ Рё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЏРј РјРѕРЅРµС‚РёР·Р°С†РёРё.')}</p>
+            <p class=\"lead\">{html.escape(entry.description or 'Краткий обзор по теме и возможностям монетизации.')}</p>
             <div class=\"actions\">
                 <a class=\"cta\" href=\"{html.escape(monetized_link)}\" rel=\"nofollow sponsored noopener\" target=\"_blank\" data-track=\"cta\" data-track-source=\"offer\" data-track-label=\"{html.escape(entry.title)}\">{html.escape(cta_text)}</a>
             </div>
@@ -660,7 +660,7 @@ document.addEventListener('click', function (event) {
         </section>
 
         <section class=\"ad-slot\">
-            <p>Р РµРєР»Р°РјРЅС‹Р№ СЃР»РѕС‚ (РІСЃС‚Р°РІСЊС‚Рµ AdSense/РґСЂСѓРіСѓСЋ СЃРµС‚СЊ)</p>
+            <p>Рекламный слот (вставьте AdSense/другую сеть)</p>
             <pre>&lt;!-- Ad code here --&gt;</pre>
         </section>
 
@@ -681,15 +681,15 @@ def write_css(path: Path) -> None:
 body {
     margin: 0;
     font-family: Inter, Segoe UI, Arial, sans-serif;
-    background: radial-gradient(1200px 500px at 20% -10%, #e0e7ff 0%, #f8fafc 48%, #f8fafc 100%);
-    color: #111827;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    color: #0f172a;
 }
-.container { max-width: 940px; margin: 0 auto; padding: 26px; }
-h1 { margin: 10px 0 12px; line-height: 1.2; font-size: clamp(28px, 4vw, 38px); }
-h3 { margin: 0 0 8px; font-size: 20px; }
-p { line-height: 1.6; }
+.container { max-width: 980px; margin: 0 auto; padding: 28px 20px 40px; }
+h1 { margin: 10px 0 12px; line-height: 1.2; font-size: clamp(30px, 4.2vw, 44px); letter-spacing: -0.02em; }
+h3 { margin: 0 0 8px; font-size: 21px; }
+p { line-height: 1.7; }
 
-.page-head { margin-bottom: 14px; }
+.page-head { margin-bottom: 18px; }
 .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .tag {
     display: inline-flex;
@@ -697,22 +697,22 @@ p { line-height: 1.6; }
     padding: 6px 10px;
     font-size: 12px;
     border-radius: 999px;
-    background: #eef2ff;
-    color: #4338ca;
+    background: #e0e7ff;
+    color: #3730a3;
     font-weight: 600;
 }
 
 .card, .ad-slot, .post-list li {
     background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
-    border: 1px solid #eef2ff;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
 }
 
 .hero {
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, #0f172a, #312e81);
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, #0f172a, #4338ca);
     color: #f8fafc;
 }
 .hero .hook { color: #e2e8f0; }
@@ -730,7 +730,7 @@ p { line-height: 1.6; }
 
 .meta, .disclaimer { color: #6b7280; font-size: 14px; }
 .lead { margin: 0 0 10px; }
-.back { color: #4f46e5; text-decoration: none; font-weight: 600; }
+.back { color: #4338ca; text-decoration: none; font-weight: 700; }
 .hook { margin-top: 0; font-weight: 700; }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
@@ -740,18 +740,19 @@ p { line-height: 1.6; }
     text-decoration: none;
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: #fff;
-    padding: 11px 15px;
+    padding: 12px 16px;
     border-radius: 12px;
     font-weight: 700;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
 }
-.cta:hover { transform: translateY(-1px); }
+.cta:hover { transform: translateY(-1px); filter: brightness(1.03); }
 .cta-secondary { background: #111827; }
 
 .spotlight { border-left: 4px solid #6366f1; }
 
 .post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .post-list li { transition: transform .16s ease, box-shadow .16s ease; }
-.post-list li:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,23,42,.10); }
+.post-list li:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(15,23,42,.12); }
 .post-list a { color: #111827; text-decoration: none; }
 .post-title { font-size: 18px; line-height: 1.35; margin: 0; }
 .post-meta { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
@@ -801,6 +802,12 @@ p { line-height: 1.6; }
 .ad-slot pre { overflow-x: auto; }
 .footer { margin-top: 22px; color: #6b7280; font-size: 14px; }
 .footer a { color: #4f46e5; text-decoration: none; }
+
+@media (max-width: 640px) {
+    .container { padding: 18px 14px 28px; }
+    .card, .ad-slot, .post-list li { padding: 16px; border-radius: 14px; }
+    .hot-grid { grid-template-columns: 1fr; }
+}
 """.strip()
     path.write_text(css, encoding="utf-8-sig")
 
@@ -808,7 +815,7 @@ p { line-height: 1.6; }
 def render_index(posts: List[Dict], config: Dict) -> str:
     telegram_channel = config.get("telegram", {}).get("channel_url", "")
     lead_magnet = config.get("lead_magnet", {})
-    hero_cta_label = lead_magnet.get("button_text", "РџРѕР»СѓС‡РёС‚СЊ Р±РѕРЅСѓСЃ")
+    hero_cta_label = lead_magnet.get("button_text", "Получить бонус")
     hero_cta_url = lead_magnet.get("url", "")
     analytics = config.get("analytics", {})
     goatcounter_site = analytics.get("goatcounter_site", "")
@@ -824,6 +831,8 @@ def render_index(posts: List[Dict], config: Dict) -> str:
     if not isinstance(home_keywords, list):
         home_keywords = []
     home_keywords_content = ", ".join(str(item).strip() for item in home_keywords if str(item).strip())
+    admin_enabled = bool(config.get("admin", {}).get("enabled", True))
+    admin_link_html = "<span>В·</span><a href=\"admin.html\">Admin</a>" if admin_enabled else ""
 
     analytics_script = (
         f'<script data-goatcounter="https://{html.escape(goatcounter_site)}/count" async src="//gc.zgo.at/count.js"></script>'
@@ -857,13 +866,13 @@ document.addEventListener('click', function (event) {
         else ""
     )
     hero_telegram_html = (
-        f'<p class="meta">РЎР»РµРґРёС‚СЊ Р·Р° РѕР±РЅРѕРІР»РµРЅРёСЏРјРё: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
+        f'<p class="meta">Следить за обновлениями: <a href="{html.escape(telegram_channel)}" target="_blank" rel="noopener">Telegram</a></p>'
         if telegram_channel
         else ""
     )
 
     stats_html = (
-        f'<div class="stats"><span class="stat">РџРѕСЃС‚РѕРІ: {len(posts)}</span><span class="stat">РћР±РЅРѕРІР»СЏРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё</span><span class="stat">РўРµРјР°: AI / Productivity</span></div>'
+        f'<div class="stats"><span class="stat">Постов: {len(posts)}</span><span class="stat">Обновляется автоматически</span><span class="stat">Тема: AI / Productivity</span></div>'
     )
 
     source_counts: Dict[str, int] = {}
@@ -876,7 +885,7 @@ document.addEventListener('click', function (event) {
         f'<span class="tag">{html.escape(domain)} В· {count}</span>' for domain, count in top_sources
     )
     trust_block_html = (
-        f'<section class="card"><h3>РџСЂРѕРІРµСЂРµРЅРЅС‹Рµ РёСЃС‚РѕС‡РЅРёРєРё</h3><p class="meta">Р›РµРЅС‚Р° СЃРѕР±РёСЂР°РµС‚СЃСЏ РёР· РЅРµСЃРєРѕР»СЊРєРёС… РґРѕРјРµРЅРѕРІ, С‡С‚РѕР±С‹ РЅРµ Р·Р°РІРёСЃРµС‚СЊ РѕС‚ РѕРґРЅРѕРіРѕ СЃР°Р№С‚Р°.</p><div class="tag-row">{source_chips_html}</div></section>'
+        f'<section class="card"><h3>Проверенные источники</h3><p class="meta">Лента собирается из нескольких доменов, чтобы не зависеть от одного сайта.</p><div class="tag-row">{source_chips_html}</div></section>'
         if source_chips_html
         else ""
     )
@@ -885,7 +894,7 @@ document.addEventListener('click', function (event) {
         ("AI", "ai", ["ai", "openai", "claude", "copilot", "llm", "gpt"]),
         ("SaaS", "saas", ["saas", "startup", "tool", "platform", "software"]),
         ("Deal", "deal", ["deal", "discount", "sale", "promo", "coupon", "off"]),
-        ("Free", "free", ["free", "Р±РµСЃРїР»Р°С‚РЅРѕ"]),
+        ("Free", "free", ["free", "бесплатно"]),
         ("Show HN", "showhn", ["show hn"]),
     ]
 
@@ -904,7 +913,7 @@ document.addEventListener('click', function (event) {
     items = []
     for post in posts:
         items.append(
-            f"<li><a href=\"posts/{html.escape(post['filename'])}\"><h3 class=\"post-title\">{html.escape(post['title'])}</h3><div class=\"post-meta\"><span class=\"tag\">{html.escape(post['published_at'])}</span><span class=\"tag\">Р§РёС‚Р°С‚СЊ РѕР±Р·РѕСЂ</span></div></a></li>"
+            f"<li><a href=\"posts/{html.escape(post['filename'])}\"><h3 class=\"post-title\">{html.escape(post['title'])}</h3><div class=\"post-meta\"><span class=\"tag\">{html.escape(post['published_at'])}</span><span class=\"tag\">Читать обзор</span></div></a></li>"
         )
 
     hot_items = []
@@ -914,11 +923,11 @@ document.addEventListener('click', function (event) {
             for item in get_hot_badges(post["title"])
         )
         hot_items.append(
-            f"<article class=\"hot-item\"><div class=\"hot-kicker\">Р“РѕСЂСЏС‡РёР№ РѕС„С„РµСЂ #{index}</div><div class=\"hot-badges\">{badge_html}</div><a href=\"posts/{html.escape(post['filename'])}\"><h4 class=\"hot-title\">{html.escape(post['title'])}</h4></a><a class=\"hot-link\" href=\"posts/{html.escape(post['filename'])}\" data-track=\"cta\" data-track-source=\"hot-offer\" data-track-label=\"{html.escape(post['title'])}\">РћС‚РєСЂС‹С‚СЊ в†—</a></article>"
+            f"<article class=\"hot-item\"><div class=\"hot-kicker\">Горячий оффер #{index}</div><div class=\"hot-badges\">{badge_html}</div><a href=\"posts/{html.escape(post['filename'])}\"><h4 class=\"hot-title\">{html.escape(post['title'])}</h4></a><a class=\"hot-link\" href=\"posts/{html.escape(post['filename'])}\" data-track=\"cta\" data-track-source=\"hot-offer\" data-track-label=\"{html.escape(post['title'])}\">Открыть ↗</a></article>"
         )
 
     hot_html = f'<div class="hot-grid">{"".join(hot_items)}</div>' if hot_items else ""
-    posts_html = "\n".join(items) if items else "<li>РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ. Р—Р°РїСѓСЃС‚РёС‚Рµ РіРµРЅРµСЂР°С‚РѕСЂ РїРѕР·Р¶Рµ.</li>"
+    posts_html = "\n".join(items) if items else "<li>Пока нет материалов. Запустите генератор позже.</li>"
 
     seo_tags = ""
     home_json_ld = ""
@@ -992,6 +1001,97 @@ document.addEventListener('click', function (event) {
 """
 
 
+def render_admin_page(config: Dict, posts: List[Dict], published_total: int) -> str:
+    admin = config.get("admin", {})
+    code = str(admin.get("access_code", "0606") or "0606")
+    title = str(admin.get("title", "Admin Panel") or "Admin Panel")
+    recent_titles = [post.get("title", "") for post in posts[:7]]
+    payload = {
+        "total": int(published_total),
+        "index_count": len(posts),
+        "recent": recent_titles,
+    }
+
+    script = f"""
+<script>
+(function() {{
+  const ADMIN_CODE = {json.dumps(code)};
+  const payload = {json.dumps(payload, ensure_ascii=False)};
+  const form = document.getElementById('admin-login-form');
+  const input = document.getElementById('admin-code');
+  const status = document.getElementById('admin-status');
+  const panel = document.getElementById('admin-panel');
+
+  function openPanel() {{
+    panel.style.display = 'block';
+    document.getElementById('admin-total').textContent = String(payload.total || 0);
+    document.getElementById('admin-index-count').textContent = String(payload.index_count || 0);
+    const list = document.getElementById('admin-recent-list');
+    list.innerHTML = '';
+    (payload.recent || []).forEach(function(item) {{
+      const li = document.createElement('li');
+      li.textContent = item;
+      list.appendChild(li);
+    }});
+  }}
+
+  form.addEventListener('submit', function(event) {{
+    event.preventDefault();
+    const value = input.value.trim();
+    if (!value) {{
+      status.textContent = 'Введите код.';
+      return;
+    }}
+    if (value !== ADMIN_CODE) {{
+      status.textContent = 'Неверный код.';
+      return;
+    }}
+    status.textContent = 'Вход выполнен.';
+    localStorage.setItem('aap_admin_auth', 'ok');
+    openPanel();
+  }});
+
+  if (localStorage.getItem('aap_admin_auth') === 'ok') {{
+    status.textContent = 'Активная сессия администратора.';
+    openPanel();
+  }}
+}})();
+</script>
+"""
+
+    return f"""<!doctype html>
+<html lang=\"ru\">
+<head>
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>{html.escape(title)} | {html.escape(config.get('brand_name', 'AutoAffiliate Pulse'))}</title>
+    <link rel=\"stylesheet\" href=\"assets/style.css\" />
+</head>
+<body>
+    <main class=\"container\">
+        <a href=\"index.html\" class=\"back\">← На главную</a>
+        <section class=\"card\">
+            <h1>{html.escape(title)}</h1>
+            <p class=\"meta\">Введите ваш код для входа в админ-режим.</p>
+            <form id=\"admin-login-form\" class=\"actions\">
+                <input id=\"admin-code\" type=\"password\" placeholder=\"Код администратора\" style=\"padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;min-width:240px;\" />
+                <button class=\"cta\" type=\"submit\">Войти</button>
+            </form>
+            <p id=\"admin-status\" class=\"meta\"></p>
+            <section id=\"admin-panel\" class=\"card\" style=\"display:none;margin-top:14px;\">
+                <p><strong>Всего постов:</strong> <span id=\"admin-total\">0</span></p>
+                <p><strong>Постов в индексе:</strong> <span id=\"admin-index-count\">0</span></p>
+                <h3>Последние заголовки</h3>
+                <ul id=\"admin-recent-list\" class=\"post-list\"></ul>
+            </section>
+        </section>
+    </main>
+    {script}
+</body>
+</html>
+"""
+
+
 def render_legal_page(title: str, content_html: str, config: Dict) -> str:
     return f"""<!doctype html>
 <html lang=\"ru\">
@@ -1017,17 +1117,17 @@ def write_legal_pages(paths: Dict[str, Path], config: Dict) -> None:
     contact_email = html.escape(config.get("legal", {}).get("contact_email", "contact@example.com"))
 
     privacy_content = f"""
-<p>РњС‹ СѓРІР°Р¶Р°РµРј РІР°С€Сѓ РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚СЊ. РЎР°Р№С‚ {brand_name} РјРѕР¶РµС‚ РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ С‚РµС…РЅРёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ (РЅР°РїСЂРёРјРµСЂ, IP, user-agent, cookies) РґР»СЏ Р°РЅР°Р»РёС‚РёРєРё Рё СѓР»СѓС‡С€РµРЅРёСЏ СЃРµСЂРІРёСЃР°.</p>
-<p>РњС‹ РјРѕР¶РµРј РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃС‚РѕСЂРѕРЅРЅРёРµ СЃРµСЂРІРёСЃС‹ Р°РЅР°Р»РёС‚РёРєРё Рё СЂРµРєР»Р°РјС‹, РєРѕС‚РѕСЂС‹Рµ РїСЂРёРјРµРЅСЏСЋС‚ cookies РІ СЂР°РјРєР°С… СЃРІРѕРёС… РїРѕР»РёС‚РёРє.</p>
-<p>РњС‹ РЅРµ РїСЂРѕРґР°С‘Рј РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ С‚СЂРµС‚СЊРёРј Р»РёС†Р°Рј. РџРѕ РІРѕРїСЂРѕСЃР°Рј РѕР±СЂР°Р±РѕС‚РєРё РґР°РЅРЅС‹С…: {contact_email}.</p>
-<p>РџРѕР»СЊР·СѓСЏСЃСЊ СЃР°Р№С‚РѕРј, РІС‹ СЃРѕРіР»Р°С€Р°РµС‚РµСЃСЊ СЃ СЌС‚РѕР№ РїРѕР»РёС‚РёРєРѕР№ РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё.</p>
+<p>Мы уважаем вашу конфиденциальность. Сайт {brand_name} может обрабатывать технические данные (например, IP, user-agent, cookies) для аналитики и улучшения сервиса.</p>
+<p>Мы можем использовать сторонние сервисы аналитики и рекламы, которые применяют cookies в рамках своих политик.</p>
+<p>Мы не продаём персональные данные третьим лицам. По вопросам обработки данных: {contact_email}.</p>
+<p>Пользуясь сайтом, вы соглашаетесь с этой политикой конфиденциальности.</p>
 """.strip()
 
     disclaimer_content = f"""
-<p>Р§Р°СЃС‚СЊ СЃСЃС‹Р»РѕРє РЅР° СЃР°Р№С‚Рµ {brand_name} СЏРІР»СЏСЋС‚СЃСЏ РїР°СЂС‚РЅС‘СЂСЃРєРёРјРё (affiliate links). Р•СЃР»Рё РІС‹ СЃРѕРІРµСЂС€Р°РµС‚Рµ РїРѕРєСѓРїРєСѓ РїРѕ С‚Р°РєРѕР№ СЃСЃС‹Р»РєРµ, РјС‹ РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕРјРёСЃСЃРёСЋ Р±РµР· РґРѕРїР»Р°С‚С‹ РґР»СЏ РІР°СЃ.</p>
-<p>РњР°С‚РµСЂРёР°Р»С‹ РЅРѕСЃСЏС‚ РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Р№ С…Р°СЂР°РєС‚РµСЂ Рё РЅРµ СЏРІР»СЏСЋС‚СЃСЏ С„РёРЅР°РЅСЃРѕРІРѕР№, СЋСЂРёРґРёС‡РµСЃРєРѕР№ РёР»Рё РёРЅРІРµСЃС‚РёС†РёРѕРЅРЅРѕР№ СЂРµРєРѕРјРµРЅРґР°С†РёРµР№.</p>
-<p>РњС‹ СЃС‚СЂРµРјРёРјСЃСЏ Рє С‚РѕС‡РЅРѕСЃС‚Рё РґР°РЅРЅС‹С…, РЅРѕ РЅРµ РіР°СЂР°РЅС‚РёСЂСѓРµРј Р°РєС‚СѓР°Р»СЊРЅРѕСЃС‚СЊ С†РµРЅ, СѓСЃР»РѕРІРёР№ Рё РЅР°Р»РёС‡РёСЏ РѕС„С„РµСЂРѕРІ Сѓ СЃС‚РѕСЂРѕРЅРЅРёС… СЃРµСЂРІРёСЃРѕРІ.</p>
-<p>РџРѕ РІРѕРїСЂРѕСЃР°Рј Рё РїСЂРµС‚РµРЅР·РёСЏРј: {contact_email}.</p>
+<p>Часть ссылок на сайте {brand_name} являются партнёрскими (affiliate links). Если вы совершаете покупку по такой ссылке, мы можем получить комиссию без доплаты для вас.</p>
+<p>Материалы носят информационный характер и не являются финансовой, юридической или инвестиционной рекомендацией.</p>
+<p>Мы стремимся к точности данных, но не гарантируем актуальность цен, условий и наличия офферов у сторонних сервисов.</p>
+<p>По вопросам и претензиям: {contact_email}.</p>
 """.strip()
 
     (paths["output"] / "privacy.html").write_text(
@@ -1135,7 +1235,7 @@ def build_telegram_run_report(config: Dict, result: Dict[str, int]) -> str:
 
     if report_mode == "detailed":
         lines = [
-            f"{brand}: С†РёРєР» Р·Р°РІРµСЂС€С‘РЅ",
+            f"{brand}: цикл завершён",
             f"created={result.get('created', 0)}",
             f"fetched={result.get('fetched', 0)}",
             f"fetched_raw={result.get('fetched_raw', 0)}",
@@ -1159,6 +1259,56 @@ def build_telegram_run_report(config: Dict, result: Dict[str, int]) -> str:
     if home_url:
         lines.append(home_url)
     return "\n".join(lines)
+
+
+def collect_monetization_warnings(config: Dict) -> List[str]:
+    warnings: List[str] = []
+
+    affiliate = config.get("affiliate", {})
+    domain_rules = affiliate.get("domain_rules", [])
+    if not domain_rules:
+        warnings.append("affiliate.domain_rules пустой: комиссии начисляться не будут")
+
+    for rule in domain_rules:
+        domain = str(rule.get("domain", "")).strip()
+        params = rule.get("params", {})
+        if not domain:
+            warnings.append("в affiliate.domain_rules найдено правило без domain")
+            continue
+        if not params:
+            warnings.append(f"у domain={domain} нет params: партнерский ID не задан")
+            continue
+        for key, value in params.items():
+            value_text = str(value).strip()
+            if not value_text:
+                warnings.append(f"domain={domain}: пустой параметр {key}")
+            elif value_text.upper().startswith("YOUR_"):
+                warnings.append(f"domain={domain}: замените плейсхолдер {key}={value_text}")
+
+    analytics = config.get("analytics", {})
+    goatcounter_site = str(analytics.get("goatcounter_site", "")).strip()
+    if not goatcounter_site:
+        warnings.append("analytics.goatcounter_site пустой: клики по CTA не отслеживаются")
+
+    telegram = config.get("telegram", {})
+    channel_url = str(telegram.get("channel_url", "")).strip()
+    if not channel_url:
+        warnings.append("telegram.channel_url пустой: упущен канал захвата аудитории")
+
+    lead_url = str(config.get("lead_magnet", {}).get("url", "")).strip()
+    if not lead_url:
+        warnings.append("lead_magnet.url пустой: не работает захват лидов")
+
+    return warnings
+
+
+def print_monetization_warnings(warnings: List[str]) -> None:
+    if not warnings:
+        print("monetization_check=ok")
+        return
+    print(f"monetization_check=warnings count={len(warnings)}")
+    for item in warnings:
+        print(f"- {item}")
 
 
 def run_once(config: Dict) -> Dict[str, int]:
@@ -1363,9 +1513,11 @@ def run_once(config: Dict) -> Dict[str, int]:
     posts = load_recent_posts(conn)
     index_html = render_index(posts, config)
     (paths["output"] / "index.html").write_text(index_html, encoding="utf-8-sig")
-    write_seo_files(paths, posts, config)
 
     total_published = conn.execute("SELECT COUNT(*) FROM published").fetchone()[0]
+    admin_html = render_admin_page(config, posts, int(total_published))
+    (paths["output"] / "admin.html").write_text(admin_html, encoding="utf-8-sig")
+    write_seo_files(paths, posts, config)
 
     conn.close()
 
@@ -1433,6 +1585,9 @@ def rebuild_all_posts(config: Dict) -> Dict[str, int]:
     posts = load_recent_posts(conn)
     index_html = render_index(posts, config)
     (paths["output"] / "index.html").write_text(index_html, encoding="utf-8-sig")
+    total_published = conn.execute("SELECT COUNT(*) FROM published").fetchone()[0]
+    admin_html = render_admin_page(config, posts, int(total_published))
+    (paths["output"] / "admin.html").write_text(admin_html, encoding="utf-8-sig")
     write_seo_files(paths, posts, config)
 
     conn.close()
@@ -1465,6 +1620,16 @@ def main() -> None:
         action="store_true",
         help="РџРµСЂРµСЃРѕР±СЂР°С‚СЊ РІСЃРµ СЂР°РЅРµРµ РѕРїСѓР±Р»РёРєРѕРІР°РЅРЅС‹Рµ РїРѕСЃС‚С‹ РїРѕ С‚РµРєСѓС‰РµРјСѓ С€Р°Р±Р»РѕРЅСѓ",
     )
+    parser.add_argument(
+        "--monetization-check-only",
+        action="store_true",
+        help="Проверить конфиг монетизации и завершить работу",
+    )
+    parser.add_argument(
+        "--strict-monetization",
+        action="store_true",
+        help="Завершать запуск с ошибкой, если найдены проблемы монетизации",
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config)
@@ -1477,6 +1642,14 @@ def main() -> None:
             raise FileNotFoundError("РЎРѕР·РґР°Р№С‚Рµ config.json РЅР° РѕСЃРЅРѕРІРµ config.example.json")
 
     config = load_config(config_path)
+    monetization_warnings = collect_monetization_warnings(config)
+    print_monetization_warnings(monetization_warnings)
+
+    if args.monetization_check_only:
+        return
+
+    if args.strict_monetization and monetization_warnings:
+        raise RuntimeError("monetization_check_failed: исправьте предупреждения и повторите запуск")
 
     if args.daemon:
         run_daemon(config, args.interval)
