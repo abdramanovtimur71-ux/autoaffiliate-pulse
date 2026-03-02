@@ -11,6 +11,9 @@
     "startup",
     "tool",
     "saas",
+    "lifetime deal",
+    "coupon",
+    "pricing",
     "скидка",
     "бесплатно"
   ],
@@ -21,16 +24,19 @@
     "coupon",
     "lifetime",
     "promo",
+    "trial",
+    "best",
+    "compare",
     "review",
     "скидка",
     "цена",
     "тариф",
     "промокод"
   ],
-  "min_publish_score": 3,
+  "min_publish_score": 4,
   "money_mode": true,
-  "money_mode_min_score": 5,
-  "money_mode_require_commercial_in_title": false,
+  "money_mode_min_score": 8,
+  "money_mode_require_commercial_in_title": true,
   "money_mode_require_affiliate_domain": false,
   "money_mode_fallback": true,
   "feeds": [
@@ -93,6 +99,24 @@
         "params": {
           "tag": "YOUR_AMAZON_TAG"
         }
+      },
+      {
+        "domain": "hostinger.com",
+        "params": {
+          "ref": "YOUR_HOSTINGER_ID"
+        }
+      },
+      {
+        "domain": "envato.com",
+        "params": {
+          "ref": "YOUR_ENVATO_ID"
+        }
+      },
+      {
+        "domain": "canva.com",
+        "params": {
+          "ref": "YOUR_CANVA_ID"
+        }
       }
     ]
   },
@@ -119,5 +143,10 @@
       "tools",
       "offers"
     ]
+  },
+  "admin": {
+    "enabled": true,
+    "access_code": "0606",
+    "title": "Admin Panel"
   }
 }
