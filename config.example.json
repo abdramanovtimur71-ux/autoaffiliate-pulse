@@ -91,31 +91,31 @@
       {
         "domain": "appsumo.com",
         "params": {
-          "aff": "YOUR_ID"
+            "aff": "113751504689851681931"
         }
       },
       {
         "domain": "amazon.com",
         "params": {
-          "tag": "YOUR_AMAZON_TAG"
+            "tag": "еап21"
         }
       },
       {
         "domain": "hostinger.com",
         "params": {
-          "ref": "YOUR_HOSTINGER_ID"
+           "ref": "тим тим"
         }
       },
       {
         "domain": "envato.com",
         "params": {
-          "ref": "YOUR_ENVATO_ID"
+           "ref": "ВАШ_ID"
         }
       },
       {
         "domain": "canva.com",
         "params": {
-          "ref": "YOUR_CANVA_ID"
+           "ref": "tim24"
         }
       }
     ]
